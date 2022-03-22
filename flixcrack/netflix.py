@@ -236,7 +236,7 @@ class NetflixClient:
                 f"{output_folder}/",
                 f"subtitles[{viewable_id}]",
                 f"[{subtitles['language']}]",
-                f"[{subtitles['language_code']}].ass",
+                f"[{subtitles['language_code']}].vtt",
             ])
             if not os.path.exists(subtitles_filename):
                 self.log(f"Downloading {subtitles_filename}...")
@@ -270,7 +270,7 @@ class NetflixClient:
 
     async def _get_subtitles(self, url, output):
         proc = await asyncio.create_subprocess_exec(
-            "ffmpeg", "-y", "-i", url, output, 
+            "ffmpeg", "-y", "-i", "-f", "copy", url, output, 
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )

@@ -1,0 +1,4 @@
+requests
+iso_639
+protobuf
+pycryptodomex

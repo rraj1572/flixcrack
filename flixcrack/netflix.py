@@ -238,7 +238,8 @@ class NetflixClient:
             if not os.path.exists(subtitles_filename):
                 self.log(f"Downloading {subtitles_filename}...")
                 await self._aria2c(subtitles["url"], subtitles_filename)
-    
+                self.log(f"Converting {subtitles_filename} to SRT...")
+                await self._to_srt(subtitles_filename)
         self.log(f"Muxing all tracks...")
         muxer = Muxer(output_folder, muxed_filename)
         file_data = await muxer.run()
@@ -263,6 +264,17 @@ class NetflixClient:
                 f"E{str(episode).zfill(2)}."
         filename += f"NF.WEBDL.$quality$p-{group}.mkv"
         return filename
+
+    async def _to_srt(self, subtitles: str):
+        raw = ".".join(subtitles.split(".")[:-1])
+        proc = await asyncio.create_subprocess_exec(
+            "ffmpeg", "-i", subtitles, "-f", "srt", f"{raw}.srt",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        std = await proc.communicate()
+        self._verbose(std)
+        os.remove(subtitles)
         
     async def _decrypt(self, _input, output, keys: list[str]):
         keys_arg = ",".join([

@@ -105,7 +105,6 @@ def get_profiles(video_profile: str, audio_profile: str, quality: int):
         ]
     if quality >= 480:
         profiles += [
-            f"playready-h264{profile_id}pl30-dash",
             f"playready-h264{profile_id}pl22-dash"
         ]
     profiles += supported_audio_profiles.get(audio_profile.lower())

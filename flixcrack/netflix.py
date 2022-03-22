@@ -46,7 +46,7 @@ class NetflixClient:
         self,
         email: str,
         password: str,
-        device: str = None,
+        device: str,
         cookies_file: str="cookies.txt",
         download_path: str="downloads",
         audio_profile: str="aac",
@@ -58,7 +58,6 @@ class NetflixClient:
         subtitle_language: list = [],
         forced_language: list = [],
         shaka_executable: str = "shakapackager",
-        no_video: bool = False,
         verbose: bool = False,
         quiet: bool = False
     ):
@@ -69,7 +68,7 @@ class NetflixClient:
             raise InvalidProfile(f"Invalid audio profile: {audio_profile}")
         self.email: str = email
         self.password: str = password
-        self.device: Device = Device(device) if device else None
+        self.device: Device = Device(device)
         self.audio_profile: str = audio_profile
         self.video_profile: str = video_profile
         self.download_path: str = download_path
@@ -83,7 +82,6 @@ class NetflixClient:
         self.cookies: dict = read_data(cookies_file)
         self.verbose: bool = verbose
         self.quiet: bool = quiet
-        self.no_video: bool = no_video if device else True
         self.shaka_executable: str = shaka_executable
         self.msl: MSLClient = MSLClient(self)
 
@@ -168,39 +166,37 @@ class NetflixClient:
         return download_list
 
     async def download(self, viewable_id, output=None) -> str:
-        output_folder = self.download_path \
-            if self.no_video else f"temp{viewable_id}"
+        output_folder = f"temp{viewable_id}"
         playlist = Parse(self.msl.load_playlist(viewable_id), self)
-        if not self.no_video:
-            keys = self.get_keys(viewable_id)
-            muxed_filename = f"{self.download_path}/" + \
-                (output or f"{viewable_id}.mkv")
-            video_stream = playlist.video_streams[0]
+        keys = self.get_keys(viewable_id)
+        muxed_filename = f"{self.download_path}/" + \
+            (output or f"{viewable_id}.mkv")
+        video_stream = playlist.video_streams[0]
 
-            encrypted_filename = "".join([
-                f"{output_folder}/",
-                f"video[{viewable_id}]",
-                f"[{video_stream['h']}p]",
-                f"[{self.video_profile.upper()}]"
-            ])
-            decrypted_filename = encrypted_filename + "[Decrypted].mp4"
+        encrypted_filename = "".join([
+            f"{output_folder}/",
+            f"video[{viewable_id}]",
+            f"[{video_stream['h']}p]",
+            f"[{self.video_profile.upper()}]"
+        ])
+        decrypted_filename = encrypted_filename + "[Decrypted].mp4"
 
-            if not os.path.exists(output_folder):
-                os.mkdir(output_folder)
-            if not os.path.exists(encrypted_filename) and \
-            not os.path.exists(decrypted_filename):
-                self.log(f"Downloading {encrypted_filename} " + \
-                    f"({self._pretty_size(video_stream['size'])})...")
-                await self._aria2c(
-                    video_stream["url"],
-                    encrypted_filename
-                )
-            if not os.path.exists(decrypted_filename):
-                self.log(f"Decrypting {encrypted_filename}...")
-                await self._decrypt(
-                    encrypted_filename,
-                    decrypted_filename, keys
-                )
+        if not os.path.exists(output_folder):
+            os.mkdir(output_folder)
+        if not os.path.exists(encrypted_filename) and \
+        not os.path.exists(decrypted_filename):
+            self.log(f"Downloading {encrypted_filename} " + \
+                f"({self._pretty_size(video_stream['size'])})...")
+            await self._aria2c(
+                video_stream["url"],
+                encrypted_filename
+            )
+        if not os.path.exists(decrypted_filename):
+            self.log(f"Decrypting {encrypted_filename}...")
+            await self._decrypt(
+                encrypted_filename,
+                decrypted_filename, keys
+            )
 
         for language in list(playlist.audio_streams.keys()) + \
         list(playlist.audio_description_streams.keys()):
@@ -241,19 +237,18 @@ class NetflixClient:
             if not os.path.exists(subtitles_filename):
                 self.log(f"Downloading {subtitles_filename}...")
                 await self._get_subtitles(subtitles["url"], subtitles_filename)
-
-        if not self.no_video:
-            self.log(f"Muxing all tracks...")
-            muxer = Muxer(output_folder, muxed_filename)
-            file_data = await muxer.run()
-            for k, v in file_data.items():
-                final_name = muxed_filename.replace(f"${k}$", v)
-                if os.path.exists(final_name):
-                    os.remove(final_name)
-                os.rename(muxed_filename, final_name)
-            self.log(f"Muxed: {final_name}",
-                f"({self._pretty_size(os.path.getsize(final_name))})")
-            return final_name
+    
+        self.log(f"Muxing all tracks...")
+        muxer = Muxer(output_folder, muxed_filename)
+        file_data = await muxer.run()
+        for k, v in file_data.items():
+            final_name = muxed_filename.replace(f"${k}$", v)
+            if os.path.exists(final_name):
+                os.remove(final_name)
+            os.rename(muxed_filename, final_name)
+        self.log(f"Muxed: {final_name}",
+            f"({self._pretty_size(os.path.getsize(final_name))})")
+        return final_name
 
     def _pretty_size(self, size: int) -> str:
         return f"{size/float(1<<20):,.0f}MiB"

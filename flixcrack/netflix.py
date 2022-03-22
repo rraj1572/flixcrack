@@ -126,6 +126,7 @@ class NetflixClient:
         challenge = wvdecrypt.get_challenge()
         current_sessionId = str(time.time()).replace(".", "")[0:-2]
         data = self.msl.get_license(challenge, current_sessionId)
+        self._verbose(data)
         if "licenseResponseBase64" not in data["result"][0]:
             raise Denied("You can't get " + \
                 f"{self.video_profile.upper()}{self.quality} " \

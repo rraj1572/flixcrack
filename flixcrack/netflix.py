@@ -238,8 +238,8 @@ class NetflixClient:
             if not os.path.exists(subtitles_filename):
                 self.log(f"Downloading {subtitles_filename}...")
                 await self._aria2c(subtitles["url"], subtitles_filename)
-                self.log(f"Converting {subtitles_filename} to SRT...")
-                await self._to_srt(subtitles_filename)
+                # self.log(f"Converting {subtitles_filename} to SRT...")
+                # await self._to_srt(subtitles_filename)
         self.log(f"Muxing all tracks...")
         muxer = Muxer(output_folder, muxed_filename)
         file_data = await muxer.run()

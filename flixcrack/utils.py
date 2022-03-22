@@ -1,8 +1,8 @@
-import random, os, requests, re
+import requests
+import random
+import os
 
 from http.cookiejar import MozillaCookieJar
-
-build_id_pattern = r'"BUILD_IDENTIFIER":"([a-z0-9]+)"'
 
 metadata_endpoint = "https://www.netflix.com/api/shakti/{}/metadata"
 
@@ -49,18 +49,11 @@ def build_headers():
         "Accept-Language": "en,en-US;q=0.9",
     }
 
-def get_build_id(cookies: dict) -> str:
-    r = requests.get(
-        "https://www.netflix.com/browse",
-        headers=build_headers(),
-        cookies=cookies
-    )
+def get_build_id() -> str:
+    r = requests.get("https://www.netflix.com/buildIdentifier")
     if r.status_code != 200:
         raise Exception("Netflix didn't return 200")
-    match = re.search(build_id_pattern, r.text)
-    if not match:
-        raise Exception("Invalid cookies. (Missing build_id)")
-    return match.group(1)
+    return r.json()["BUILD_IDENTIFIER"]
 
 def read_data(cookies_file):
     if not os.path.exists(cookies_file):
@@ -71,7 +64,7 @@ def read_data(cookies_file):
         cookie.name: cookie.value
         for cookie in cj
     }
-    cookies["build_id"] = get_build_id(cookies)
+    cookies["build_id"] = get_build_id()
     if "NetflixId" not in cookies:
         raise Exception("Invalid cookies. (Missing NetflixId)")
     return cookies

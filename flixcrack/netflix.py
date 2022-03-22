@@ -169,7 +169,7 @@ class NetflixClient:
 
     async def download(self, viewable_id, output=None) -> str:
         output_folder = self.download_path \
-            if not self.no_video else f"temp{viewable_id}"
+            if self.no_video else f"temp{viewable_id}"
         playlist = Parse(self.msl.load_playlist(viewable_id), self)
         if not self.no_video:
             keys = self.get_keys(viewable_id)

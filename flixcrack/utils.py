@@ -90,10 +90,11 @@ supported_audio_profiles = {
 
 def get_profiles(video_profile: str, audio_profile: str, quality: int):
     profiles = [
-		"webvtt-lssdh-ios8",
-		"BIF240",
-		"BIF320"
-	]
+        "dfxp-ls-sdh",
+        "webvtt-lssdh-ios8",
+        "BIF240",
+        "BIF320"
+    ]
     profile_id = video_profile[0].lower()
     if quality >= 1080:
         profiles += [

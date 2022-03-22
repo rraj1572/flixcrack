@@ -266,7 +266,7 @@ class NetflixClient:
 
     async def _get_subtitles(self, url, output):
         proc = await asyncio.create_subprocess_exec(
-            "ffmpeg", "-y", "-i", "-f", "copy", url, output, 
+            "ffmpeg", "-y", "-i", url, "-f", "copy", output, 
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )

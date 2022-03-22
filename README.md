@@ -36,10 +36,24 @@
 
 ## How To Use
 
+First of all, install the library with `pip install git+https://github.com/stefanodvx/flixcrack@main` (you need Git for this)
+
 Extract your cookies.txt from browser (you can use <a href="https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid">Get cookies.txt</a>) and put it in your working folder. Then create a folder named "devices" and put your CDM in. Here's an example code, I'm downloading first episode of a series in 1080p with HIGH profile and AAC audio (English).
 
 You can extract a private L3 CDM very easily from an Android phone using <a href="https://github.com/wvdumper/dumper">this tool</a>.
 
+Working folder example:
+```bash
+│   cookies.txt
+│   main.py
+│
+└───devices
+    └───<device name>
+            device_client_id_blob
+            device_private_key
+```
+
+main.py:
 ```python3
 from flixcrack import NetflixClient
 import asyncio

@@ -1,4 +1,4 @@
 requests
-iso_639
+iso-639
 protobuf
 pycryptodomex

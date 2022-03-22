@@ -40,6 +40,18 @@ Extract your cookies.txt from browser (you can use <a href="https://chrome.googl
 
 You can extract a private L3 CDM very easily from an Android phone using <a href="https://github.com/wvdumper/dumper">this tool</a>.
 
+Working folder example:
+```bash
+│   cookies.txt
+│   main.py
+│
+└───devices
+    └───<device name>
+            device_client_id_blob
+            device_private_key
+```
+
+main.py:
 ```python3
 from flixcrack import NetflixClient
 import asyncio

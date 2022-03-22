@@ -67,3 +67,5 @@ async def main():
         )
 asyncio.run(main())
 ```
+
+**DISCLAIMER:** I don't have any responsability for your use. This is just informative.

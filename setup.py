@@ -3,6 +3,9 @@ import setuptools
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
+with open("requirements.txt", "r", encoding="utf-8") as f:
+    requirements = f.read().splitlines()
+
 setuptools.setup(
     name="flixcrack",
     version="1.0",
@@ -19,12 +22,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    install_requires=[
-        "requests",
-        "iso_639",
-        "protobuf",
-        "pycryptodomex"
-    ],
+    install_requires=requirements,
     packages=setuptools.find_packages(),
     python_requires=">=3.6",
 )

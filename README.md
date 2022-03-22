@@ -9,7 +9,8 @@
 <p align="center">
   <a href="#features">Features</a> •
   <a href="#dependencies">Dependencies</a> •
-  <a href="#how-to-use">How To Use</a>
+  <a href="#how-to-use">How To Use</a> •
+  <a href="#community">Community</a>
 </p>
 
 <h1 align="center">
@@ -67,5 +68,9 @@ async def main():
         )
 asyncio.run(main())
 ```
+
+## Community
+
+* <a href="https://t.me/+jwaFzZu6B-w1ZmQ8">Telegram Group</a>
 
 **DISCLAIMER:** I don't have any responsability for your use. This is just informative.

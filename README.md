@@ -87,4 +87,8 @@ asyncio.run(main())
 
 * <a href="https://t.me/+jwaFzZu6B-w1ZmQ8">Telegram Group</a>
 
-**DISCLAIMER:** I don't have any responsability for your use. This is just informative.
+## Disclaimer
+
+* This library is for informational purposes only
+* Your Netflix account could get banned
+* Your CDM could get downgraded

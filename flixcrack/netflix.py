@@ -61,7 +61,8 @@ class NetflixClient:
         verbose: bool = False,
         quiet: bool = False
     ):
-        if video_profile.lower() not in supported_video_profiles:
+        if video_profile.lower() not in map(lambda x: x.lower(),
+                supported_video_profiles.keys()):
             raise InvalidProfile(f"Invalid video profile: {video_profile}")
         if audio_profile.lower() not in map(lambda x: x.lower(),
                 supported_audio_profiles.keys()):

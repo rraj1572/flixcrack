@@ -263,7 +263,7 @@ class NetflixClient:
         if season:
             filename += f"S{str(season).zfill(2)}" + \
                 f"E{str(episode).zfill(2)}."
-        filename += f"NF.WEBDL.$quality$p-{group}.mkv"
+        filename += f"NF.WEBDL.$quality$p.$codec$-{group}.mkv"
         return filename
 
     async def _to_srt(self, subtitles: str):
@@ -282,13 +282,16 @@ class NetflixClient:
             f"label={random.randint(1, 100)}:key_id={kid}:key={key}" for kid, key in
             map(lambda x: x.split(":"), keys)
         ])
-        proc = await asyncio.create_subprocess_exec(
-            self.shaka_executable, f"input={_input},stream=video,output={output}", 
-            "--enable_raw_key_decryption", "--keys", keys_arg,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-        std = await proc.communicate()
+        try:
+            proc = await asyncio.create_subprocess_exec(
+                self.shaka_executable, f"input={_input},stream=video,output={output}", 
+                "--enable_raw_key_decryption", "--keys", keys_arg,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+            )
+            std = await proc.communicate()
+        except FileNotFoundError:
+            raise FileNotFoundError(f"{self.shaka_executable} not found in your PATH or in your working folder.")
         self._verbose(std)
         error = (std[0].decode()+std[1].decode()) \
             .strip().split("\n")[-1].strip()
@@ -299,37 +302,46 @@ class NetflixClient:
         os.remove(_input)
 
     async def _demux_audio(self, _input, output):
-        proc = await asyncio.create_subprocess_exec(
-            "ffmpeg", "-y", "-i", _input,
-            "-map", "0:a", "-c", "copy", output, 
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-        std = await proc.communicate()
+        try:
+            proc = await asyncio.create_subprocess_exec(
+                "ffmpeg", "-y", "-i", _input,
+                "-map", "0:a", "-c", "copy", output, 
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+            )
+            std = await proc.communicate()
+        except FileNotFoundError:
+            raise FileNotFoundError("FFmpeg not found in your PATH or in your working folder.")
         self._verbose(std)
         os.remove(_input)
 
     async def _ffprobe(self, _input) -> dict:
-        proc = await asyncio.create_subprocess_shell(
-            f"ffprobe -print_format json -show_format -show_streams \"{_input}\" > \"{_input}.json\"",
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-        std = await proc.communicate()
+        try:
+            proc = await asyncio.create_subprocess_shell(
+                f"ffprobe -print_format json -show_format -show_streams \"{_input}\" > \"{_input}.json\"",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+            )
+            std = await proc.communicate()
+        except FileNotFoundError:
+            raise FileNotFoundError("FFprobe not found in your PATH or in your working folder.")
         self._verbose(std)
         data = json.load(open(f"{_input}.json", "r"))
         os.remove(f"{_input}.json")
         return data
 
     async def _aria2c(self, _input, output):
-        proc = await asyncio.create_subprocess_exec(
-            "aria2c", "-x16", "-j16", "-s16",
-            "--auto-file-renaming=false",
-            "-o", output, _input,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-        std = await proc.communicate()
+        try:
+            proc = await asyncio.create_subprocess_exec(
+                "aria2c", "-x16", "-j16", "-s16",
+                "--auto-file-renaming=false",
+                "-o", output, _input,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+            )
+            std = await proc.communicate()
+        except FileNotFoundError:
+            raise FileNotFoundError("aria2 not found in your PATH or in your working folder.")
         self._verbose(std)
 
 class MSLClient:

@@ -69,7 +69,14 @@ def read_data(cookies_file):
         raise Exception("Invalid cookies. (Missing NetflixId)")
     return cookies
 
-supported_video_profiles = ["high", "main", "baseline"]
+supported_video_profiles = {
+    "high": "playready-h264hpl{}-dash",
+    "main": "playready-h264mpl{}-dash",
+    "baseline": "playready-h264bpl{}-dash",
+    "hevc": "hevc-main10-L{}-dash-cenc-prk",
+    "hdr": "hevc-hdr-main10-L{}-dash-cenc-prk"
+}
+
 supported_audio_profiles = {
     "aac": [
         "heaac-5.1-dash",
@@ -89,24 +96,15 @@ supported_audio_profiles = {
 }
 
 def get_profiles(video_profile: str, audio_profile: str, quality: int):
-    profiles = [
-        "webvtt-lssdh-ios8",
-        "BIF240",
-        "BIF320"
-    ]
-    profile_id = video_profile[0].lower()
+    profiles = ["webvtt-lssdh-ios8"]
+    profile = supported_video_profiles.get(video_profile.lower())
     if quality >= 1080:
-        profiles += [
-            f"playready-h264{profile_id}pl40-dash"
-        ]
+        if video_profile.lower() in ["hevc", "hdr"]:
+            profiles += [profile.format(41)]
+        profiles += [profile.format(40)]
     if quality >= 720:
-        profiles += [
-            f"playready-h264{profile_id}pl31-dash"
-        ]
+        profiles += [profile.format(31)]
     if quality >= 480:
-        profiles += [
-            f"playready-h264{profile_id}pl30-dash",
-            f"playready-h264{profile_id}pl22-dash"
-        ]
+        profiles += [profile.format(30), profile.format(22)]
     profiles += supported_audio_profiles.get(audio_profile.lower())
     return profiles

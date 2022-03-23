@@ -8,6 +8,14 @@ from iso639 import languages
 video_reg = re.compile(r"video\[\d+\]\[(?P<quality>\d+)p\]\[(?P<profile>[^\]]+)\]")
 audio_subs_reg = re.compile(r"(audio|subtitles)\[\d+\]\[(?P<language>[^\]]+)\]\[(?P<id>[^\]]+)\]")
 
+codecs = {
+    "MAIN": "x264",
+    "HIGH": "x264",
+    "BASELINE": "x264",
+    "HEVC": "H265",
+    "HDR": "HDR.H265"
+}
+
 class Muxer:
     def __init__(self, folder, muxed):
         self.folder = folder
@@ -32,6 +40,7 @@ class Muxer:
                 for v in files[k]:
                     match = video_reg.search(v)
                     data["quality"] = match.group("quality")
+                    data["codec"] = codecs.get(match.group("profile"))
                     self.command += [
                         "mkvmerge",
                         "--output",

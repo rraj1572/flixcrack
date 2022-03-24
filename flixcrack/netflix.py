@@ -7,6 +7,7 @@ import os
 import re
 
 from .protos import wv_proto2_pb2 as wvproto
+from .converter import vtt_to_srt
 from .types import Device, CDMSession, EncryptionKey
 from .muxer import Muxer
 from .parser import Parse
@@ -239,8 +240,8 @@ class NetflixClient:
             if not os.path.exists(subtitles_filename):
                 self.log(f"Downloading {subtitles_filename}...")
                 await self._aria2c(subtitles["url"], subtitles_filename)
-                # self.log(f"Converting {subtitles_filename} to SRT...")
-                # await self._to_srt(subtitles_filename)
+                self.log(f"Converting {subtitles_filename} to SRT...")
+                await self._to_srt(subtitles_filename)
         self.log(f"Muxing all tracks...")
         muxer = Muxer(output_folder, muxed_filename)
         final_name = muxed_filename
@@ -270,13 +271,10 @@ class NetflixClient:
 
     async def _to_srt(self, subtitles: str):
         raw = ".".join(subtitles.split(".")[:-1])
-        proc = await asyncio.create_subprocess_exec(
-            "ffmpeg", "-i", subtitles, "-f", "srt", f"{raw}.srt",
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-        std = await proc.communicate()
-        self._verbose(std)
+        content = open(subtitles, "r", encoding="utf-8").read()
+        srt = vtt_to_srt(content)
+        with open(raw+".srt", "w+", encoding="utf-8") as f:
+            f.write(srt)
         os.remove(subtitles)
         
     async def _decrypt(self, _input, output, keys: list[str]):

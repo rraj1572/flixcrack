@@ -2,6 +2,7 @@ Czech
 German
 English
 European Spanish
+Canadian French
 French
 Hindi
 Hungarian

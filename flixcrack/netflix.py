@@ -243,9 +243,11 @@ class NetflixClient:
                 # await self._to_srt(subtitles_filename)
         self.log(f"Muxing all tracks...")
         muxer = Muxer(output_folder, muxed_filename)
+        final_name = muxed_filename
         file_data = await muxer.run()
         for k, v in file_data.items():
-            final_name = muxed_filename.replace(f"${k}$", v)
+            final_name = final_name.replace(f"${k}$", v)
+        if final_name != muxed_filename:
             if os.path.exists(final_name):
                 os.remove(final_name)
             os.rename(muxed_filename, final_name)

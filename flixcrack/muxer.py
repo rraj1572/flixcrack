@@ -55,7 +55,7 @@ class Muxer:
                     language = lang_codes.get(match.group("id"))
                     self.command += [
                         "--language",
-						"0:"+language[0]
+                        "0:"+language[1],
                         "--track-name",
                         "0:"+match.group("language"),
                         "--default-track",
@@ -70,7 +70,7 @@ class Muxer:
                     language = lang_codes.get(match.group("id"))
                     self.command += [
                         "--language",
-						"0:"+language[0]
+                        "0:"+language[1],
                         "--track-name",
                         "0:"+match.group("language"),
                         "--default-track",

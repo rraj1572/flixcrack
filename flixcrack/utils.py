@@ -69,6 +69,44 @@ def read_data(cookies_file):
         raise Exception("Invalid cookies. (Missing NetflixId)")
     return cookies
 
+lang_codes = {
+    "cs": ["Czech", "ces"],
+    "de": ["German", "ger"],
+    "en": ["English", "eng"],
+    "es-ES": ["European Spanish", "spa"],
+    "fr": ["French", "fre"],
+    "hi": ["Hindi", "hin"],
+    "hu": ["Hungarian", "hun"],
+    "id": ["Indonesian", "ind"], 
+    "it": ["Italian", "ita"],
+    "pl": ["Polish", "pol"],
+    "pt-BR": ["Brazilian Portuguese", "por"],
+    "ru": ["Russian", "rus"],
+    "ta": ["Tamil", "tam"],
+    "te": ["Telugu", "tel"],
+    "th": ["Thai", "tha"],
+    "tr": ["Turkish", "tur"],
+    "uk": ["Ukrainian", "ukr"],
+    "ar": ["Arabic", "ara"],
+    "da": ["Danish", "dan"],
+    "el": ["Greek", "ell"],
+    "fi": ["Finnish", "fin"],
+    "he": ["Hebrew", "heb"],
+    "hi-Latn": ["Hindi", "hin"],
+    "hr": ["Croatian", "hrv"],
+    "ja": ["Japanese", "jpn"],
+    "ko": ["Korean", "kor"],
+    "ms": ["Malay", "msa"],
+    "nb": ["Norwegian", "nob"],
+    "nl": ["Dutch", "nld"],
+    "pt": ["Portuguese", "por"],
+    "ro": ["Romanian", "ron"],
+    "sv": ["Swedish", "swe"],
+    "vi": ["Vietnamese", "vie"],
+    "zh-Hans": ["Simplified Chinese", "zho"],
+    "zh-Hant": ["Traditional Chinese", "zho"]
+}
+
 supported_video_profiles = {
     "high": "playready-h264hpl{}-dash",
     "main": "playready-h264mpl{}-dash",

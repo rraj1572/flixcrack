@@ -636,7 +636,7 @@ class MSLClient:
         response = self.session.post(self.manifests, data=request_data)
         manifest = json.loads(json.dumps(self.decrypt_response(response.text)))
         self.config._verbose(manifest)
-	if error := manifest.get("errormsg", manifest.get("error")):
+        if error := manifest.get("errormsg", manifest.get("error")):
             if manifest.get("errorcode") == 7:
                 raise LoginError(manifest.get("error", {}).get("display", error))
             raise MSLClientError(manifest.get("error", {}).get("display", error))

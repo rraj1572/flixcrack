@@ -3,7 +3,7 @@ import shutil
 import os
 import re
 
-from iso639 import languages
+from .utils import lang_codes
 
 video_reg = re.compile(r"video\[\d+\]\[(?P<quality>\d+)p\]\[(?P<profile>[^\]]+)\]")
 audio_subs_reg = re.compile(r"(audio|subtitles)\[\d+\]\[(?P<language>[^\]]+)\]\[(?P<id>[^\]]+)\]")
@@ -52,11 +52,10 @@ class Muxer:
             if k == "audio":
                 for v in files[k]:
                     match = audio_subs_reg.search(v)
+                    language = lang_codes.get(match.group("id"))
                     self.command += [
                         "--language",
-						"0:"+languages.get(
-                            alpha2=match.group("id").split("-")[0]
-                        ).bibliographic,
+						"0:"+language[0]
                         "--track-name",
                         "0:"+match.group("language"),
                         "--default-track",
@@ -68,11 +67,10 @@ class Muxer:
             if k == "subtitles":
                 for v in files[k]:
                     match = audio_subs_reg.search(v)
+                    language = lang_codes.get(match.group("id"))
                     self.command += [
                         "--language",
-						"0:"+languages.get(
-                            alpha2=match.group("id").split("-")[0]
-                        ).bibliographic,
+						"0:"+language[0]
                         "--track-name",
                         "0:"+match.group("language"),
                         "--default-track",

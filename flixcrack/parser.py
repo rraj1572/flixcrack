@@ -1,6 +1,6 @@
-
-import iso639
 import re
+
+from .utils import lang_codes
 
 clean_name = re.compile(
     r"(\s*\[Original\]\s*|\s*-\s*Audio Description)"
@@ -20,9 +20,11 @@ class Parse:
         )
         self.audio_streams = dict()
         for track in playlist["result"]["audio_tracks"]:
-            original = iso639.languages.get(
-                alpha2=track["language"].split("-")[0]
-            ).name
+            track_language = track["language"]
+            original = lang_codes.get(track_language, [None])[0]
+            if not original:
+                print(f"{track_language} skipped. Please report this!")
+                continue
             language = clean_name.sub("", original)
             if "Audio Description" in track["languageDescription"]:
                 continue
@@ -42,9 +44,11 @@ class Parse:
 
         self.audio_description_streams = dict()
         for track in playlist["result"]["audio_tracks"]:
-            original = iso639.languages.get(
-                alpha2=track["language"].split("-")[0]
-            ).name
+            track_language = track["language"]
+            original = lang_codes.get(track_language, [None])[0]
+            if not original:
+                print(f"{track_language} skipped. Please report this!")
+                continue
             language = clean_name.sub("", original)
             if "Audio Description" not in track["languageDescription"]:
                 continue
@@ -68,15 +72,15 @@ class Parse:
             not track["language"] or track["isNoneTrack"] or \
             track["trackType"] == "ASSISTIVE": # I skip ASSISTIVE cuz yes
                 continue
-            original = original = iso639.languages.get(
-                alpha2=track["language"].split("-")[0]
-            ).name
+            track_language = track["language"]
+            original = lang_codes.get(track_language, [None])[0]
+            if not original:
+                print(f"{track_language} skipped. Please report this!")
+                continue
             language = clean_name.sub("", original)
             if language not in client.subtitle_language and \
             "all" not in client.subtitle_language:
                 continue
-            # _type = "dfxp-ls-sdh" if track["rawTrackType"] == \
-            #     "closedcaptions" else "webvtt-lssdh-ios8"
             url = list(track["ttDownloadables"]["webvtt-lssdh-ios8"]["downloadUrls"].values())[0]
             self.subtitle_streams[language] = [
                 dict(
@@ -92,9 +96,11 @@ class Parse:
             not track["language"] or track["isNoneTrack"] or \
             track["trackType"] == "ASSISTIVE": # I skip ASSISTIVE cuz yes:
                 continue
-            original = iso639.languages.get(
-                alpha2=track["language"].split("-")[0]
-            ).name
+            track_language = track["language"]
+            original = lang_codes.get(track_language, [None])[0]
+            if not original:
+                print(f"{track_language} skipped. Please report this!")
+                continue
             language = clean_name.sub("", original)
             if language not in client.forced_language and \
             "all" not in client.forced_language:

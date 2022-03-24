@@ -73,6 +73,7 @@ lang_codes = {
     "cs": ["Czech", "ces"],
     "de": ["German", "ger"],
     "en": ["English", "eng"],
+    "es": ["Spansih", "spa"],
     "es-ES": ["European Spanish", "spa"],
     "fr": ["French", "fre"],
     "hi": ["Hindi", "hin"],

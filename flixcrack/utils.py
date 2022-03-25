@@ -11,8 +11,11 @@ licenses_url = "https://www.netflix.com/nq/msl_v1/cadmium/pbo_licenses/^1.0.0/ro
 
 def random_hex(length: int) -> str:
 	return "".join(random.choice("0123456789ABCDEF") for _ in range(length))
+    
 manifest_esn = f"NFCDIE-03-{random_hex(30)}"
-android_esn = f"NFANDROID1-PRV-P-SAMSUSM-G950F-7169-{random_hex(30)}"
+def get_android_esn(q: int):
+    _id = 2 if q >= 2160 else 1
+    return f"NFANDROID{_id}-PRV-P-SAMSUSM-G950F-7169-{random_hex(30)}"
 
 def shakti_headers(build_id):
     return {
@@ -111,11 +114,11 @@ lang_codes = {
 }
 
 supported_video_profiles = {
-    "high": "playready-h264hpl{}-dash",
-    "main": "playready-h264mpl{}-dash",
-    "baseline": "playready-h264bpl{}-dash",
-    "hevc": "hevc-main10-L{}-dash-cenc-prk",
-    "hdr": "hevc-hdr-main10-L{}-dash-cenc-prk"
+    "high": ["playready-h264hpl{}-dash"],
+    "main": ["playready-h264mpl{}-dash"],
+    "baseline": ["playready-h264bpl{}-dash"],
+    "hevc": ["hevc-main10-L{}-dash-cenc", "hevc-main10-L{}-dash-cenc-prk"],
+    "hdr": ["hevc-hdr-main10-L{}-dash-cenc", "hevc-hdr-main10-L{}-dash-cenc-prk"]
 }
 
 supported_audio_profiles = {
@@ -139,13 +142,17 @@ supported_audio_profiles = {
 def get_profiles(video_profile: str, audio_profile: str, quality: int):
     profiles = ["webvtt-lssdh-ios8"]
     profile = supported_video_profiles.get(video_profile.lower())
+    if quality >= 2160:
+        profiles += list(map(lambda x: x.format(51), profile))
+        profiles += list(map(lambda x: x.format(50), profile))
     if quality >= 1080:
         if video_profile.lower() in ["hevc", "hdr"]:
-            profiles += [profile.format(41)]
-        profiles += [profile.format(40)]
+            profiles += list(map(lambda x: x.format(41), profile))
+        profiles += list(map(lambda x: x.format(40), profile))
     if quality >= 720:
-        profiles += [profile.format(31)]
+        profiles += list(map(lambda x: x.format(31), profile))
     if quality >= 480:
-        profiles += [profile.format(30), profile.format(22)]
+        profiles += list(map(lambda x: x.format(30), profile))
+        profiles += list(map(lambda x: x.format(22), profile))
     profiles += supported_audio_profiles.get(audio_profile.lower())
     return profiles

@@ -330,8 +330,8 @@ class NetflixClient:
                 "--download-result=hide",
                 "--auto-file-renaming=false",
                 "-o", output, _input,
-                stdout=asyncio.subprocess.PIPE if not self.quiet else None,
-                stderr=asyncio.subprocess.PIPE if not self.quiet else None
+                stdout=asyncio.subprocess.PIPE if self.quiet else None,
+                stderr=asyncio.subprocess.PIPE if self.quiet else None
             )
             std = await proc.communicate()
         except FileNotFoundError:

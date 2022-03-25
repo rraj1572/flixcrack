@@ -7,7 +7,7 @@ import os
 import re
 
 from .protos import wv_proto2_pb2 as wvproto
-from .converter import vtt_to_srt
+from .converter import Converter
 from .types import Device, CDMSession, EncryptionKey
 from .muxer import Muxer
 from .parser import Parse
@@ -241,7 +241,8 @@ class NetflixClient:
                 self.log(f"Downloading {subtitles_filename}...")
                 await self._aria2c(subtitles["url"], subtitles_filename)
                 self.log(f"Converting {subtitles_filename} to SRT...")
-                await self._to_srt(subtitles_filename)
+                Converter(subtitles_filename).to_srt()
+                os.remove(subtitles_filename)
         self.log(f"Muxing all tracks...")
         muxer = Muxer(output_folder, muxed_filename)
         final_name = muxed_filename
@@ -268,14 +269,6 @@ class NetflixClient:
                 f"E{str(episode).zfill(2)}."
         filename += f"NF.WEBDL.$quality$p.$codec$-{group}.mkv"
         return filename
-
-    async def _to_srt(self, subtitles: str):
-        raw = ".".join(subtitles.split(".")[:-1])
-        content = open(subtitles, "r", encoding="utf-8").read()
-        srt = vtt_to_srt(content)
-        with open(raw+".srt", "w+", encoding="utf-8") as f:
-            f.write(srt)
-        os.remove(subtitles)
         
     async def _decrypt(self, _input, output, keys: list[str]):
         keys_arg = ",".join([

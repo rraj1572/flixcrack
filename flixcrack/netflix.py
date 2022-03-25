@@ -328,6 +328,7 @@ class NetflixClient:
             proc = await asyncio.create_subprocess_exec(
                 "aria2c", "-x16", "-j16", "-s16",
                 "--download-result=hide",
+		"--summary-interval=0",
                 "--auto-file-renaming=false",
                 "-o", output, _input,
                 stdout=asyncio.subprocess.PIPE if self.quiet else None,

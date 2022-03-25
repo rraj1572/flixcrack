@@ -19,6 +19,7 @@ from Cryptodome.PublicKey import RSA
 from Cryptodome.Signature import pss
 from Cryptodome.Util import Padding
 from datetime import datetime
+from importlib.metadata import version
 
 from .utils import (
     read_data,
@@ -58,7 +59,8 @@ class NetflixClient:
         audio_description_language: list = [],
         subtitle_language: list = [],
         forced_language: list = [],
-        shaka_executable: str = "shakapackager",
+        decryption_method: str = "shaka",
+        decrypt_executable: str = "shakapackager",
         verbose: bool = False,
         quiet: bool = False
     ):
@@ -68,6 +70,11 @@ class NetflixClient:
         if audio_profile.lower() not in map(lambda x: x.lower(),
                 supported_audio_profiles.keys()):
             raise InvalidProfile(f"Invalid audio profile: {audio_profile}")
+        methods = ["shaka", "mp4decrypt"]
+        if decryption_method not in methods:
+            raise NameError(f"Invalid decryption method: {decryption_method}. " + \
+                "Set value to one of these: " + ", ".join(methods)
+            )
         self.email: str = email
         self.password: str = password
         self.device: Device = Device(device)
@@ -84,7 +91,8 @@ class NetflixClient:
         self.cookies: dict = read_data(cookies_file)
         self.verbose: bool = verbose
         self.quiet: bool = quiet
-        self.shaka_executable: str = shaka_executable
+        self.decryption_method = decryption_method
+        self.decryption_executable: str = decrypt_executable
         self.msl: MSLClient = MSLClient(self)
 
     def log(self, *args):
@@ -169,6 +177,7 @@ class NetflixClient:
         return download_list
 
     async def download(self, viewable_id, output=None) -> str:
+        self.log("Starting process... [FlixCrack {}]".format(version("flixcrack")))
         output_folder = f"temp{viewable_id}"
         playlist = Parse(self.msl.load_playlist(viewable_id), self)
         keys = self.get_keys(viewable_id)
@@ -271,20 +280,26 @@ class NetflixClient:
         return filename
         
     async def _decrypt(self, _input, output, keys: list[str]):
-        keys_arg = ",".join([
-            f"label={random.randint(1, 100)}:key_id={kid}:key={key}" for kid, key in
-            map(lambda x: x.split(":"), keys)
-        ])
+        if self.decryption_method == "shaka":
+            cmd = [
+                f"input={_input},stream=video,output={output}",
+                "--enable_raw_key_decryption", "--keys",
+                ",".join([
+                    f"label={random.randint(1, 100)}:key_id={kid}:key={key}" for kid, key in
+                    map(lambda x: x.split(":"), keys)
+                ])
+            ]
+        elif self.decryption_method == "mp4decrypt":
+            cmd = [*" ".join([f"--key {key}" for key in keys]).split(), _input, output]
         try:
             proc = await asyncio.create_subprocess_exec(
-                self.shaka_executable, f"input={_input},stream=video,output={output}", 
-                "--enable_raw_key_decryption", "--keys", keys_arg,
+                self.decryption_executable, *cmd,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE
             )
             std = await proc.communicate()
         except FileNotFoundError:
-            raise FileNotFoundError(f"{self.shaka_executable} not found in your PATH or in your working folder.")
+            raise FileNotFoundError(f"{self.decryption_executable} not found in your PATH or in your working folder.")
         self._verbose(std)
         error = (std[0].decode()+std[1].decode()) \
             .strip().split("\n")[-1].strip()

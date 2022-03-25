@@ -29,7 +29,7 @@ from .utils import (
     supported_audio_profiles,
     manifests_url,
     licenses_url,
-    android_esn
+    get_android_esn
 )
 
 from .errors import (
@@ -351,7 +351,7 @@ class MSLClient:
         self.session = requests.Session()
         self.manifests = manifests_url
         self.licenses = licenses_url
-        self.esn = android_esn
+        self.esn = get_android_esn(config.quality)
         self.email = config.email
         self.password = config.password
         self.device = config.device

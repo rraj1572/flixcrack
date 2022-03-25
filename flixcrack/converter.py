@@ -36,6 +36,7 @@ class Converter:
         )
         lines = open(self.name, "r", encoding="utf8").readlines()
         
+        line_index = 1
         verical_pos = -1     
         line_pos_matrix = [
             ["7", "8", "9"],
@@ -65,8 +66,9 @@ class Converter:
             }.get(align_type, -1)
             position = line_pos_matrix[verical_pos][horizontal_pos]
             new_lines.append(
-                f"{time}\n" + ("{\\an%s}" % position) \
+                f"{line_index}\n" + f"{time}\n" + ("{\\an%s}" % position) \
                 .replace("{\\an2}", "") + fix(lines[i+1]) + "\n\n"
             )
+            line_index += 1
         with open(self.raw_name + ".srt", "w+", encoding="utf-8") as f:
             f.writelines(new_lines)

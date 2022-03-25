@@ -153,6 +153,7 @@ def get_profiles(video_profile: str, audio_profile: str, quality: int):
         profiles += list(map(lambda x: x.format(31), profile))
     if quality >= 480:
         profiles += list(map(lambda x: x.format(30), profile))
-        profiles += list(map(lambda x: x.format(22), profile))
+        if video_profile.lower not in ["hevc", "hdr"]:
+            profiles += list(map(lambda x: x.format(22), profile))
     profiles += supported_audio_profiles.get(audio_profile.lower())
     return profiles

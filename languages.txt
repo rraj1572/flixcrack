@@ -32,5 +32,6 @@ Portuguese
 Romanian
 Swedish
 Vietnamese
+Chinese
 Simplified Chinese
 Traditional Chinese

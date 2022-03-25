@@ -105,6 +105,7 @@ lang_codes = {
     "ro": ["Romanian", "ron"],
     "sv": ["Swedish", "swe"],
     "vi": ["Vietnamese", "vie"],
+    "zh": ["Chinese", "zho"],
     "zh-Hans": ["Simplified Chinese", "zho"],
     "zh-Hant": ["Traditional Chinese", "zho"]
 }

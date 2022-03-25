@@ -1,6 +1,7 @@
 Czech
 German
 English
+Spanish
 European Spanish
 Canadian French
 French

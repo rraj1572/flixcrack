@@ -327,10 +327,11 @@ class NetflixClient:
         try:
             proc = await asyncio.create_subprocess_exec(
                 "aria2c", "-x16", "-j16", "-s16",
+                "--download-result=hide"
                 "--auto-file-renaming=false",
                 "-o", output, _input,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+                stdout=asyncio.subprocess.PIPE if not self.quiet else None,
+                stderr=asyncio.subprocess.PIPE if not self.quiet else None
             )
             std = await proc.communicate()
         except FileNotFoundError:

@@ -299,45 +299,27 @@ class NetflixClient:
             proc = await asyncio.create_subprocess_exec(
                 "ffmpeg", "-y", "-i", _input,
                 "-map", "0:a", "-c", "copy", output, 
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+                stdout=asyncio.subprocess.PIPE if not self.verbose else None,
+                stderr=asyncio.subprocess.PIPE if not self.verbose else None
             )
-            std = await proc.communicate()
+            await proc.communicate()
         except FileNotFoundError:
             raise FileNotFoundError("FFmpeg not found in your PATH or in your working folder.")
-        self._verbose(std)
         os.remove(_input)
-
-    async def _ffprobe(self, _input) -> dict:
-        try:
-            proc = await asyncio.create_subprocess_shell(
-                f"ffprobe -print_format json -show_format -show_streams \"{_input}\" > \"{_input}.json\"",
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
-            )
-            std = await proc.communicate()
-        except FileNotFoundError:
-            raise FileNotFoundError("FFprobe not found in your PATH or in your working folder.")
-        self._verbose(std)
-        data = json.load(open(f"{_input}.json", "r"))
-        os.remove(f"{_input}.json")
-        return data
 
     async def _aria2c(self, _input, output):
         try:
             proc = await asyncio.create_subprocess_exec(
                 "aria2c", "-x16", "-j16", "-s16",
                 "--download-result=hide",
-		"--summary-interval=0",
                 "--auto-file-renaming=false",
                 "-o", output, _input,
-                stdout=asyncio.subprocess.PIPE if self.quiet else None,
-                stderr=asyncio.subprocess.PIPE if self.quiet else None
+                stdout=asyncio.subprocess.PIPE if not self.verbose else None,
+                stderr=asyncio.subprocess.PIPE if not self.verbose else None
             )
-            std = await proc.communicate()
+            await proc.communicate()
         except FileNotFoundError:
             raise FileNotFoundError("aria2 not found in your PATH or in your working folder.")
-        self._verbose(std)
 
 class MSLClient:
     def __init__(self, config: NetflixClient):

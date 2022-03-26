@@ -91,7 +91,7 @@ class NetflixClient:
         self.cookies: dict = read_data(cookies_file)
         self.verbose: bool = verbose
         self.quiet: bool = quiet
-        self.decryption_method = decryption_method
+        self.decryption_method: str = decryption_method
         self.decryption_executable: str = decrypt_executable
         self.msl: MSLClient = MSLClient(self)
 
@@ -297,16 +297,16 @@ class NetflixClient:
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE
             )
-            std = await proc.communicate()
+            std, err = await proc.communicate()
         except FileNotFoundError:
             raise FileNotFoundError(f"{self.decryption_executable} not found in your PATH or in your working folder.")
         self._verbose(std)
-        error = (std[0].decode()+std[1].decode()) \
-            .strip().split("\n")[-1].strip()
-        if "finalized" not in error.lower():
-            if os.path.exists(output):
-                os.remove(output)
-            raise DecryptionError(f"Error decrypting: {error}")
+        if err:
+            stderr = err.decode()
+            if "finalized" not in stderr.lower():
+                if os.path.exists(output):
+                    os.remove(output)
+                raise DecryptionError(f"Error decrypting: {err}")
         os.remove(_input)
 
     async def _demux_audio(self, _input, output):

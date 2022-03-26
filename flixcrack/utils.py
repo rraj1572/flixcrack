@@ -77,6 +77,7 @@ lang_codes = {
     "de": ["German", "ger"],
     "en": ["English", "eng"],
     "es": ["Spanish", "spa"],
+    "en-GB": ["Britain English", "eng"],
     "es-ES": ["European Spanish", "spa"],
     "fr-CA": ["Canadian French", "fra"],
     "fr": ["French", "fra"],

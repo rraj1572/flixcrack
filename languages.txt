@@ -1,7 +1,12 @@
 Czech
+Filipino
+Welsh
 German
 English
 Spanish
+Bulgarian
+Egyptian Arabic
+Syrian Arabic
 British English
 European Spanish
 Canadian French

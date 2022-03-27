@@ -73,10 +73,15 @@ def read_data(cookies_file):
     return cookies
 
 lang_codes = {
+    "fil": ["Filipino", "fil"],
+    "cy": ["Welsh", "cym"],
     "cs": ["Czech", "ces"],
     "de": ["German", "ger"],
     "en": ["English", "eng"],
     "es": ["Spanish", "spa"],
+    "bg": ["Bulgarian", "bul"],
+    "ar-EG": ["Egyptian Arabic", "ara"],
+    "ar-SY": ["Syrian Arabic", "ara"],
     "en-GB": ["Britain English", "eng"],
     "es-ES": ["European Spanish", "spa"],
     "fr-CA": ["Canadian French", "fra"],

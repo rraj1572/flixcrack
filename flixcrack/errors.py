@@ -1,6 +1,9 @@
 class GeoError(Exception):
     pass
 
+class InvalidLanguage(Exception):
+    pass
+
 class NotFound(Exception):
     pass
 

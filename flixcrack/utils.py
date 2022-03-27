@@ -138,6 +138,9 @@ supported_audio_profiles = {
         "ddplus-5.1hq-dash",
         "ddplus-2-dash"
     ],
+    "atmos": [
+        "ddplus-atmos-dash"
+    ]
 }
 
 def get_profiles(video_profile: str, audio_profile: str, quality: int):

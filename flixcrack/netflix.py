@@ -30,12 +30,14 @@ from .utils import (
     supported_audio_profiles,
     manifests_url,
     licenses_url,
-    get_android_esn
+    get_android_esn,
+    lang_codes
 )
 
 from .errors import (
     Denied,
     GeoError,
+    InvalidLanguage,
     LoginError,
     DecryptionError,
     InvalidProfile,
@@ -75,6 +77,15 @@ class NetflixClient:
             raise NameError(f"Invalid decryption method: {decryption_method}. " + \
                 "Set value to one of these: " + ", ".join(methods)
             )
+        for language in list(dict.fromkeys( \
+        audio_language + audio_description_language + \
+        subtitle_language + forced_language)):
+            if language not in map(lambda x: x[0], lang_codes.values()):
+                raise InvalidLanguage(
+                    f"{language} language not found or unsupported. " + \
+                    "Check languages list here: https://github.com/stefanodvx/flixcrack/blob/main/languages.txt. " + \
+                    "If you think this language is unsupported, open an issue or report in Telegram Group."
+                )
         self.email: str = email
         self.password: str = password
         self.device: Device = Device(device)

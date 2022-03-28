@@ -2,10 +2,6 @@ import re
 
 from .utils import lang_codes
 
-clean_name = re.compile(
-    r"(\s*\[Original\]\s*|\s*-\s*Audio Description)"
-)
-
 class Parse:
     def __init__(self, playlist, client):
         self.video_streams = sorted([
@@ -21,16 +17,20 @@ class Parse:
         self.audio_streams = dict()
         for track in playlist["result"]["audio_tracks"]:
             track_language = track["language"]
-            original = lang_codes.get(track_language, [None])[0]
-            if not original:
+            name = track["languageDescription"]
+            language = lang_codes.get(track_language, [None])[0]
+            if not language:
                 print(f"{track_language} skipped. Please report this!")
                 continue
-            language = clean_name.sub("", original)
-            if "Audio Description" in track["languageDescription"]:
-                continue
-            if (language not in client.audio_language) and \
-            "all" not in client.audio_language:
-                continue
+            is_original = "Original" in name
+            audio_list = map(lambda x: x.lower(), client.audio_language)
+
+            if not (is_original and "original" in audio_list) \
+            and language not in self.audio_streams:
+                if (language.lower() not in audio_list) and \
+                "all" not in audio_list or "Audio Description" in name:
+                    continue
+            
             self.audio_streams[language] = sorted([
                 dict(
                     bitrate=stream["bitrate"],
@@ -45,15 +45,14 @@ class Parse:
         self.audio_description_streams = dict()
         for track in playlist["result"]["audio_tracks"]:
             track_language = track["language"]
-            original = lang_codes.get(track_language, [None])[0]
-            if not original:
+            name = track["languageDescription"]
+            language = lang_codes.get(track_language, [None])[0]
+            if not language:
                 print(f"{track_language} skipped. Please report this!")
                 continue
-            language = clean_name.sub("", original)
-            if "Audio Description" not in track["languageDescription"]:
-                continue
-            if (language not in client.audio_description_language) and \
-            "all" not in client.audio_description_language:
+            audesc_list = map(lambda x: x.lower(), client.audio_description_language)
+            if (language.lower() not in audesc_list) and "all" not \
+            in audesc_list or "Audio Description" not in name:
                 continue
             self.audio_description_streams[language+"AD"] = sorted([
                 dict(
@@ -73,13 +72,12 @@ class Parse:
             track["trackType"] == "ASSISTIVE": # I skip ASSISTIVE cuz yes
                 continue
             track_language = track["language"]
-            original = lang_codes.get(track_language, [None])[0]
-            if not original:
+            language = lang_codes.get(track_language, [None])[0]
+            if not language:
                 print(f"{track_language} skipped. Please report this!")
                 continue
-            language = clean_name.sub("", original)
-            if language not in client.subtitle_language and \
-            "all" not in client.subtitle_language:
+            subtitles_list = map(lambda x: x.lower(), client.subtitle_language)
+            if language.lower() not in subtitles_list and "all" not in subtitles_list:
                 continue
             url = list(track["ttDownloadables"]["webvtt-lssdh-ios8"]["downloadUrls"].values())[0]
             self.subtitle_streams[language] = [
@@ -97,13 +95,12 @@ class Parse:
             track["trackType"] == "ASSISTIVE": # I skip ASSISTIVE cuz yes:
                 continue
             track_language = track["language"]
-            original = lang_codes.get(track_language, [None])[0]
-            if not original:
+            language = lang_codes.get(track_language, [None])[0]
+            if not language:
                 print(f"{track_language} skipped. Please report this!")
                 continue
-            language = clean_name.sub("", original)
-            if language not in client.forced_language and \
-            "all" not in client.forced_language:
+            forced_list = map(lambda x: x.lower(), client.forced_language)
+            if language.lower() not in forced_list and "all" not in forced_list:
                 continue
             url = list(track["ttDownloadables"]["webvtt-lssdh-ios8"]["downloadUrls"].values())[0]
             self.forced_streams[language+"F"] = [

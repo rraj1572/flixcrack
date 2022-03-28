@@ -77,11 +77,11 @@ class NetflixClient:
             raise NameError(f"Invalid decryption method: {decryption_method}. " + \
                 "Set value to one of these: " + ", ".join(methods)
             )
-        for language in list(dict.fromkeys( \
+        for language in map(lambda x: x.lower(), list(dict.fromkeys( \
         audio_language + audio_description_language + \
-        subtitle_language + forced_language)):
-            if language not in list(map(lambda x: x[0],
-            lang_codes.values())) + ["all"]:
+        subtitle_language + forced_language))):
+            if language not in list(map(lambda x: x[0].lower(),
+            lang_codes.values())) + ["all", "original"]:
                 raise InvalidLanguage(
                     f"{language} language not found or unsupported. " + \
                     "Check languages list here: https://github.com/stefanodvx/flixcrack/blob/main/languages.txt. " + \

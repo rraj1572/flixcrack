@@ -29,10 +29,11 @@ class Converter:
                 r"position:[\d.\.]+%,\w+",
                 r"align:(\w+)",
                 r"size:[\d.\.]+%",
-                r"line:([\d.\.]+)\n(.+)"
+                r"line:([\d.\.]+)%\s+(.+)"
             ]), re.DOTALL | re.MULTILINE
         )
-        lines = open(self.name, "r", encoding="utf8").read().split("\n\n")
+        file = open(self.name, "r", encoding="utf8").read()
+        lines = file.split("\n\n")
         
         line_index = 1
         verical_pos = -1     
@@ -49,7 +50,7 @@ class Converter:
             time = subtitle.group(1).replace(".", ",")
             align_type = subtitle.group(2)
             line_value = float(subtitle.group(3))
-            text = subtitle.group(3).strip()
+            text = subtitle.group(4).strip()
             if line_value <= 25.00:
                 verical_pos = 0
             elif line_value >= 75.00:

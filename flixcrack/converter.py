@@ -25,10 +25,10 @@ class Converter:
         new_lines = []
         subtitle_esp = re.compile(
             " ".join([
-                r"([\d\.:]+ \-\-\> [\d\.:]+) ",
-                r"position:[\d.\.]+%,\w+ ",
-                r"align:(\w+) ",
-                r"size:[\d.\.]+% ",
+                r"([\d\.:]+ \-\-\> [\d\.:]+)",
+                r"position:[\d.\.]+%,\w+",
+                r"align:(\w+)",
+                r"size:[\d.\.]+%",
                 r"line:([\d.\.]+)\n(.+)"
             ]), re.DOTALL | re.MULTILINE
         )

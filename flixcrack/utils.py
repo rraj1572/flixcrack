@@ -28,15 +28,15 @@ def shakti_headers(build_id):
         "Pragma": "no-cache",
         "Sec-Fetch-Mode": "cors",
         "Sec-Fetch-Site": "same-origin",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36",
         "X-Netflix.browserName": "Chrome",
-        "X-Netflix.browserVersion": "79",
+        "X-Netflix.browserVersion": "99",
         "X-Netflix.clientType": "akira",
         "X-Netflix.esnPrefix": "NFCDCH-02-",
         "X-Netflix.osFullName": "Windows 10",
         "X-Netflix.osName": "Windows",
         "X-Netflix.osVersion": "10.0",
-        "X-Netflix.playerThroughput": "1706",
+        "X-Netflix.playerThroughput": "58194",
         "X-Netflix.uiVersion": str(build_id),
     }
 
@@ -44,7 +44,7 @@ def build_headers():
     return {
         "Connection": "keep-alive",
         "Upgrade-Insecure-Requests": "1",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
         "Sec-Fetch-Site": "none",
         "Sec-Fetch-Mode": "navigate",
@@ -143,7 +143,7 @@ supported_audio_profiles = {
         "ddplus-5.1hq-dash",
         "ddplus-2-dash"
     ],
-    "atmos": [
+    "dts": [
         "ddplus-atmos-dash"
     ]
 }

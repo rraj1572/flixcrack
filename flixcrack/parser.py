@@ -23,7 +23,7 @@ class Parse:
                 print(f"{track_language} skipped. Please report this!")
                 continue
             is_original = "Original" in name
-            audio_list = map(lambda x: x.lower(), client.audio_language)
+            audio_list = list(map(lambda x: x.lower(), client.audio_language))
 
             if not (is_original and "original" in audio_list) \
             and language not in self.audio_streams:
@@ -50,7 +50,7 @@ class Parse:
             if not language:
                 print(f"{track_language} skipped. Please report this!")
                 continue
-            audesc_list = map(lambda x: x.lower(), client.audio_description_language)
+            audesc_list = list(map(lambda x: x.lower(), client.audio_description_language))
             if (language.lower() not in audesc_list) and "all" not \
             in audesc_list or "Audio Description" not in name:
                 continue
@@ -76,7 +76,7 @@ class Parse:
             if not language:
                 print(f"{track_language} skipped. Please report this!")
                 continue
-            subtitles_list = map(lambda x: x.lower(), client.subtitle_language)
+            subtitles_list = list(map(lambda x: x.lower(), client.subtitle_language))
             if language.lower() not in subtitles_list and "all" not in subtitles_list:
                 continue
             url = list(track["ttDownloadables"]["webvtt-lssdh-ios8"]["downloadUrls"].values())[0]
@@ -99,7 +99,7 @@ class Parse:
             if not language:
                 print(f"{track_language} skipped. Please report this!")
                 continue
-            forced_list = map(lambda x: x.lower(), client.forced_language)
+            forced_list = list(map(lambda x: x.lower(), client.forced_language))
             if language.lower() not in forced_list and "all" not in forced_list:
                 continue
             url = list(track["ttDownloadables"]["webvtt-lssdh-ios8"]["downloadUrls"].values())[0]

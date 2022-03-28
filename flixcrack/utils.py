@@ -143,7 +143,7 @@ supported_audio_profiles = {
         "ddplus-5.1hq-dash",
         "ddplus-2-dash"
     ],
-    "atmos": [
+    "dts": [
         "ddplus-atmos-dash"
     ]
 }

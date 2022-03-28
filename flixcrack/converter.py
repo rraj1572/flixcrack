@@ -34,6 +34,7 @@ class Converter:
         )
         lines = open(self.name, "r", encoding="utf8").read().split("\n\n")
         
+        line_index = 1
         verical_pos = -1     
         line_pos_matrix = [
             ["7", "8", "9"],
@@ -41,11 +42,14 @@ class Converter:
             ["1", "2", "3"]
         ]
         
-        for i, subtitle in enumerate(subtitle_esp.findall(lines), 1):
-            time = subtitle[0].replace(".", ",")
-            align_type = subtitle[1]
-            line_value = float(subtitle[2])
-            text = subtitle[3].strip()
+        for line in lines:
+            subtitle = subtitle_esp.search(line)
+            if not subtitle:
+                continue
+            time = subtitle.group(1).replace(".", ",")
+            align_type = subtitle.group(2)
+            line_value = float(subtitle.group(3))
+            text = subtitle.group(3).strip()
             if line_value <= 25.00:
                 verical_pos = 0
             elif line_value >= 75.00:

@@ -8,7 +8,7 @@ with open("requirements.txt", "r", encoding="utf-8") as f:
 
 setuptools.setup(
     name="flixcrack",
-    version="beta-28.03.22",
+    version="2022.03.28",
     author="stefanodvx",
     author_email="pp.stefanodvx@gmail.com",
     description="Netflix API Metadata & Downloader for Windows and Linux",

@@ -25,7 +25,7 @@ class Converter:
         new_lines = []
         subtitle_esp = re.compile(
             " ".join([
-                r"([\d\.:]+ \-\-\> [\d\.:]+)",
+                r"([\d\.:]+ \-\-\> [\d\.:]+) ",
                 r"position:[\d.\.]+%,\w+ ",
                 r"align:(\w+) ",
                 r"size:[\d.\.]+% ",
@@ -62,8 +62,9 @@ class Converter:
             }.get(align_type, -1)
             position = line_pos_matrix[verical_pos][horizontal_pos]
             new_lines.append(
-                f"{i}\n" + f"{time}\n" + ("{\\an%s}" % position) \
+                f"{line_index}\n" + f"{time}\n" + ("{\\an%s}" % position) \
                 .replace("{\\an2}", "") + fix(text) + "\n\n"
             )
+            line_index += 1
         with open(self.raw_name + ".srt", "w+", encoding="utf-8") as f:
             f.writelines(new_lines)

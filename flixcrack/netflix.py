@@ -79,7 +79,7 @@ class NetflixClient:
             )
         for language in list(dict.fromkeys( \
         audio_language + audio_description_language + \
-        subtitle_language + forced_language)):
+        subtitle_language + forced_language + ["all"])):
             if language not in map(lambda x: x[0], lang_codes.values()):
                 raise InvalidLanguage(
                     f"{language} language not found or unsupported. " + \

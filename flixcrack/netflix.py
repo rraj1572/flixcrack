@@ -25,12 +25,12 @@ from .utils import (
     read_data,
     get_profiles,
     shakti_headers,
+    get_android_esn,
     metadata_endpoint,
     supported_video_profiles,
     supported_audio_profiles,
     manifests_url,
     licenses_url,
-    get_android_esn,
     lang_codes
 )
 

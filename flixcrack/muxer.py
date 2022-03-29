@@ -23,9 +23,10 @@ codecs = {
 }
 
 class Muxer:
-    def __init__(self, folder, muxed):
+    def __init__(self, folder, muxed, verbose):
         self.folder = folder
         self.muxed = muxed
+        self.verbose = verbose
         self.command = []
 
     async def run(self) -> dict:
@@ -93,8 +94,8 @@ class Muxer:
 
         proc = await asyncio.create_subprocess_exec(
             *self.command,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
+            stdout=asyncio.subprocess.PIPE if not self.verbose else None,
+            stderr=asyncio.subprocess.PIPE if not self.verbose else None
         )
         await proc.communicate()
         shutil.rmtree(self.folder)

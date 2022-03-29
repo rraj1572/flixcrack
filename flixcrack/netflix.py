@@ -267,9 +267,10 @@ class NetflixClient:
                 Converter(subtitles_filename).to_srt()
                 os.remove(subtitles_filename)
         self.log(f"Muxing all tracks...")
-        muxer = Muxer(output_folder, muxed_filename)
+        muxer = Muxer(output_folder, muxed_filename, self.verbose)
         final_name = muxed_filename
         file_data = await muxer.run()
+        self._verbose(file_data)
         for k, v in file_data.items():
             if isinstance(v, list):
                 v = ".".join(list(dict.fromkeys(v)))

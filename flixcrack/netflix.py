@@ -131,7 +131,8 @@ class NetflixClient:
             }
         )
         if r.status_code != 200:
-            raise NetflixStatusError("Netflix did not return 200")
+            self._verbose(r.text)
+            raise NetflixStatusError(f"Netflix did not return 200 ({r.status_code})")
         if r.text.strip() == "":
             raise GeoError("Title not available in your country.")
         return r.json()["video"]

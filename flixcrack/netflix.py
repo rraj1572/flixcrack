@@ -269,6 +269,8 @@ class NetflixClient:
         final_name = muxed_filename
         file_data = await muxer.run()
         for k, v in file_data.items():
+            if isinstance(v, list):
+                v = ".".join(list(dict.fromkeys(v)))
             final_name = final_name.replace(f"${k}$", v)
         if final_name != muxed_filename:
             if os.path.exists(final_name):
@@ -288,7 +290,7 @@ class NetflixClient:
         if season:
             filename += f"S{str(season).zfill(2)}" + \
                 f"E{str(episode).zfill(2)}."
-        filename += f"NF.WEBDL.$quality$p.$codec$-{group}.mkv"
+        filename += f"NF.WEBDL.$quality$p.$vcodec$.$audios$.$acodec$-{group}.mkv"
         return filename
         
     async def _decrypt(self, _input, output, keys: list[str]):

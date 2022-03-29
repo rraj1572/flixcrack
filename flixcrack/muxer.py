@@ -5,8 +5,14 @@ import re
 
 from .utils import lang_codes
 
-video_reg = re.compile(r"video\[\d+\]\[(?P<quality>\d+)p\]\[(?P<profile>[^\]]+)\]")
-audio_subs_reg = re.compile(r"(audio|subtitles)\[\d+\]\[(?P<language>[^\]]+)\]\[(?P<id>[^\]]+)\]")
+video_reg = re.compile(
+    r"video\[\d+\]\[(?P<quality>\d+)p\]" + \
+    r"\[(?P<profile>[^\]]+)\]"
+)
+audio_subs_reg = re.compile(
+    r"(audio|subtitles)\[\d+\]\[(?P<language>[^\]]+)\]" + \
+    r"\[(?P<id>[^\]]+)\](?:\[(?P<codec>[^\]]+))?"
+)
 
 codecs = {
     "MAIN": "x264",
@@ -40,7 +46,7 @@ class Muxer:
                 for v in files[k]:
                     match = video_reg.search(v)
                     data["quality"] = match.group("quality")
-                    data["codec"] = codecs.get(match.group("profile"))
+                    data["vcodec"] = codecs.get(match.group("profile"))
                     self.command += [
                         "mkvmerge",
                         "--output",
@@ -53,6 +59,11 @@ class Muxer:
                 for v in files[k]:
                     match = audio_subs_reg.search(v)
                     language = lang_codes.get(match.group("id"))
+                    for v in ["audios", "acodec"]:
+                        if v not in data:
+                            data[v] = []
+                    data["audios"].append(language[1].upper())
+                    data["acodec"].append(match.group("codec"))
                     self.command += [
                         "--language",
                         "0:"+language[1],

@@ -85,11 +85,8 @@ class Parse:
                 continue
             url = list(track["ttDownloadables"]["webvtt-lssdh-ios8"]["downloadUrls"].values())[0]
             self.subtitle_streams[language] = [
-                dict(
-                    url=url,
-                    language=language,
-                    language_code=track["language"]
-                )
+                dict(url=url, language=language,
+                    language_code=track["language"])
             ]
 
         self.forced_streams = dict()
@@ -108,9 +105,6 @@ class Parse:
                 continue
             url = list(track["ttDownloadables"]["webvtt-lssdh-ios8"]["downloadUrls"].values())[0]
             self.forced_streams[language+"F"] = [
-                dict(
-                    url=url,
-                    language=f"{language} (Forced)",
-                    language_code=track["language"]
-                )
+                dict(url=url, language=f"{language} (Forced)",
+                    language_code=track["language"])
             ]

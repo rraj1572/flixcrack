@@ -60,11 +60,10 @@ class Muxer:
                 for v in files[k]:
                     match = audio_subs_reg.search(v)
                     language = lang_codes.get(match.group("id"))
-                    for v in ["audios", "acodec"]:
-                        if v not in data:
-                            data[v] = []
+                    if "audios" not in data:
+                        data["audios"] = []
                     data["audios"].append(language[1].upper())
-                    data["acodec"].append(match.group("codec"))
+                    data["acodec"] = match.group("codec")
                     self.command += [
                         "--language",
                         "0:"+language[1],

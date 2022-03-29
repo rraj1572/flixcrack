@@ -4,6 +4,7 @@ from .utils import lang_codes
 
 class Parse:
     def __init__(self, playlist, client):
+
         self.video_streams = sorted([
             dict(
                 bitrate=track["bitrate"],
@@ -14,10 +15,13 @@ class Parse:
             ) for track in playlist["result"]["video_tracks"][0]["streams"]],
             key=lambda x: x["bitrate"], reverse=True
         )
+    
         self.audio_streams = dict()
         for track in playlist["result"]["audio_tracks"]:
             track_language = track["language"]
             name = track["languageDescription"]
+            if "Audio Description" in name:
+                continue
             language = lang_codes.get(track_language, [None])[0]
             if not language:
                 print(f"{track_language} skipped. Please report this!")
@@ -27,8 +31,7 @@ class Parse:
 
             if not (is_original and "original" in audio_list) \
             and language not in self.audio_streams:
-                if (language.lower() not in audio_list) and \
-                "all" not in audio_list or "Audio Description" in name:
+                if language.lower() not in audio_list and "all" not in audio_list:
                     continue
             
             self.audio_streams[language] = sorted([
@@ -46,13 +49,14 @@ class Parse:
         for track in playlist["result"]["audio_tracks"]:
             track_language = track["language"]
             name = track["languageDescription"]
+            if "Audio Description" not in name:
+                continue
             language = lang_codes.get(track_language, [None])[0]
             if not language:
                 print(f"{track_language} skipped. Please report this!")
                 continue
             audesc_list = list(map(lambda x: x.lower(), client.audio_description_language))
-            if (language.lower() not in audesc_list) and "all" not \
-            in audesc_list or "Audio Description" not in name:
+            if language.lower() not in audesc_list and "all" not in audesc_list:
                 continue
             self.audio_description_streams[language+"AD"] = sorted([
                 dict(

@@ -222,6 +222,7 @@ class NetflixClient:
                 encrypted_filename,
                 decrypted_filename, keys
             )
+        await self._remux(decrypted_filename)
 
         for language in list(playlist.audio_streams.keys()) + \
         list(playlist.audio_description_streams.keys()):
@@ -284,7 +285,7 @@ class NetflixClient:
     def _pretty_size(self, size: int) -> str:
         return f"{size/float(1<<20):,.0f}MiB"
 
-    def _file_name(self, title, season, episode, group) -> str:
+    def _file_name(self, title: str, season: int, episode: int, group: str) -> str:
         watchable_name = re.sub(r"[^a-zA-Z0-9 ]", "", title)
         watchable_name = re.sub(" ", ".", watchable_name)
         filename = f"{watchable_name}."
@@ -294,7 +295,7 @@ class NetflixClient:
         filename += f"NF.WEBDL.$quality$p.$vcodec$.$audios$.$acodec$-{group}.mkv"
         return filename
         
-    async def _decrypt(self, _input, output, keys: list[str]):
+    async def _decrypt(self, _input: str, output: str, keys: list[str]):
         if self.decryption_method == "shaka":
             cmd = [
                 f"input={_input},stream=video,output={output}",
@@ -324,7 +325,22 @@ class NetflixClient:
                 raise DecryptionError(f"Error decrypting: {err}")
         os.remove(_input)
 
-    async def _demux_audio(self, _input, output):
+    async def _remux(self, _input: str):
+        try:
+            _temp = ".".join(_input.split(".")[:-1])
+            os.rename(_input, _temp)
+            proc = await asyncio.create_subprocess_exec(
+                "ffmpeg", "-y", "-i", _temp, "-c", "copy", _input, 
+                stdout=asyncio.subprocess.PIPE if not self.verbose else None,
+                stderr=asyncio.subprocess.PIPE if not self.verbose else None
+            )
+            await proc.communicate()
+            os.remove(_temp)
+        except FileNotFoundError:
+            os.rename(_temp, _input)
+            raise FileNotFoundError("FFmpeg not found in your PATH or in your working folder.")
+
+    async def _demux_audio(self, _input: str, output: str):
         try:
             proc = await asyncio.create_subprocess_exec(
                 "ffmpeg", "-y", "-i", _input,
@@ -337,7 +353,7 @@ class NetflixClient:
             raise FileNotFoundError("FFmpeg not found in your PATH or in your working folder.")
         os.remove(_input)
 
-    async def _aria2c(self, _input, output):
+    async def _aria2c(self, _input: str, output: str):
         try:
             proc = await asyncio.create_subprocess_exec(
                 "aria2c", "-x16", "-j16", "-s16",

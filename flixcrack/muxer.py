@@ -52,9 +52,9 @@ class Muxer:
                         "mkvmerge",
                         "--output",
                         self.muxed,
-                        "(",
-                        v,
-                        ")",
+                        "--compression",
+                        "0:none",
+                        "(", v, ")",
                     ]
             if k == "audio":
                 for v in files[k]:
@@ -69,11 +69,9 @@ class Muxer:
                         "0:"+language[1],
                         "--track-name",
                         "0:"+match.group("language"),
-                        "--default-track",
-                        "0:" + ("no" if "Description" in v else "yes"),
-                        "(",
-                        v,
-                        ")",
+                        "--compression",
+                        "0:none",
+                        "(", v, ")",
                     ]
             if k == "subtitles":
                 for v in files[k]:
@@ -85,10 +83,12 @@ class Muxer:
                         "--track-name",
                         "0:"+match.group("language"),
                         "--default-track",
+                        "0:no",
+                        "--forced-track",
                         "0:" + ("yes" if "Forced" in v else "no"),
-                        "(",
-                        v,
-                        ")",
+                        "--compression",
+                        "0:none",
+                        "(", v, ")",
                     ]
 
         proc = await asyncio.create_subprocess_exec(

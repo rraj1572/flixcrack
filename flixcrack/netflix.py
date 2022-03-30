@@ -282,12 +282,12 @@ class NetflixClient:
 
             file_data["ftitle"] = re.sub(" ", ".",
                 re.sub(r"[^a-zA-Z0-9 ]", "", viewable["title"]))
-            file_data["fseason"] = f"S{str(season).zfill(2)}" if viewable["season"] else None
-            file_data["fepisode"] = f"E{str(episode).zfill(2)}" if viewable["episode"] else None
+            file_data["fseason"] = f"S{str(viewable['season']).zfill(2)}" if viewable["season"] else None
+            file_data["fepisode"] = f"E{str(viewable['episode']).zfill(2)}" if viewable["episode"] else None
     
             for k, v in file_data.items():
                 if isinstance(v, list):
-                    v = ".".join(list(map(lambda x: x.lower(), list(dict.fromkeys(v)))))
+                    v = ".".join(list(map(str, list(dict.fromkeys(v)))))
                 final_name = final_name.replace(f"${k}$", str(v)).replace("..", ".")
 
             if not final_name.endswith(".mkv"):

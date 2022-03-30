@@ -197,7 +197,7 @@ class NetflixClient:
         self.log("Starting process... [FlixCrack {}]".format(version("flixcrack")))
         for viewable in self._get_viewables(any_id, episode, season):
             self._verbose(viewable)
-            viewable_id = viewable["id"]
+            viewable_id = viewable["viewable_id"]
             output_folder = f"temp{viewable_id}"
             playlist = Parse(self.msl.load_playlist(viewable_id), self)
             keys = self.get_keys(viewable_id)

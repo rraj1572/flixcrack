@@ -287,8 +287,8 @@ class NetflixClient:
     
             for k, v in file_data.items():
                 if isinstance(v, list):
-                    v = ".".join(list(dict.fromkeys(v)))
-                final_name = final_name.replace(f"${k}$", v).replace("..", ".")
+                    v = ".".join(list(map(lambda x: x.lower(), list(dict.fromkeys(v)))))
+                final_name = final_name.replace(f"${k}$", str(v)).replace("..", ".")
 
             if not final_name.endswith(".mkv"):
                 final_name += ".mkv"

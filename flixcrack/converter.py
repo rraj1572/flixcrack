@@ -3,7 +3,6 @@ import re
 def fix(text: str):
     fixes = [
         ["\r", ""],
-        ["\n", ""],
         ["&lt;", "<"],
         ["&gt;", ">"],
         ["&lrm;", "\u200e"],

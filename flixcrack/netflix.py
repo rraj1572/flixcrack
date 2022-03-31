@@ -18,8 +18,8 @@ from Cryptodome.Hash import CMAC, SHA256, HMAC, SHA1
 from Cryptodome.PublicKey import RSA
 from Cryptodome.Signature import pss
 from Cryptodome.Util import Padding
-from datetime import datetime
 from importlib.metadata import version
+from datetime import datetime
 
 from .utils import (
     read_data,
@@ -115,6 +115,20 @@ class NetflixClient:
         if not self.quiet:
             print(*args)
 
+    def _verbose_file(self, content, name=""):
+        path = "log_files"
+        if not os.path.exists(path):
+            os.mkdir(path)
+        file = name + str(random.randint(1000,5000))
+        final = f"{path}/{file}.txt"
+        with open(final, "w+", encoding="utf-8") as file:
+            try:
+                content = json.dumps(content, indent=4)
+            except:
+                pass
+            file.write(content)
+        print(f"Verbose saved in {final}")
+
     def _verbose(self, *args):
         if self.verbose:
             print(*args)
@@ -135,7 +149,7 @@ class NetflixClient:
             }, proxies=self.proxies
         )
         if r.status_code != 200:
-            self._verbose(r.text)
+            self._verbose_file(r.text, "shakti")
             raise NetflixStatusError(f"Netflix did not return 200 ({r.status_code})")
         if r.text.strip() == "":
             raise GeoError("Title not available in your country.")
@@ -153,7 +167,7 @@ class NetflixClient:
         challenge = wvdecrypt.get_challenge()
         current_sessionId = str(time.time()).replace(".", "")[0:-2]
         data = self.msl.get_license(challenge, current_sessionId)
-        self._verbose(data)
+        self._verbose_file(data, "msl")
         if "licenseResponseBase64" not in data["result"][0]:
             raise Denied("You can't get " + \
                 f"{self.video_profile.upper()}{self.quality} " \
@@ -163,7 +177,7 @@ class NetflixClient:
         keyswvdecrypt = wvdecrypt.start_process()[1]
         return keyswvdecrypt
 
-    def _get_viewables(self, any_id, episode=None, season=None) -> list:
+    def get_viewables(self, any_id, episode=None, season=None) -> list:
         download_list = []
         metadata = self.get_metadata(any_id)
         _type = metadata["type"]
@@ -174,7 +188,8 @@ class NetflixClient:
             episode=None
         )
         if _type == "movie":
-            download_list.append(viewable_data)
+            viewable_data["title"] = metadata["year"]
+            download_list.append(Viewable(viewable_data, self))
         elif _type == "show":
             if not season:
                 season = 1
@@ -185,122 +200,11 @@ class NetflixClient:
                 for episode_item in season_item["episodes"]:
                     if episode == "all" or episode_item["seq"] == episode:
                         episode_data = viewable_data.copy()
-                        episode_data.update(dict(
-                            viewable_id=episode_item["id"],
-                            season=season_item["seq"],
-                            episode=episode_item["seq"]
-                        ))
-                        download_list.append(episode_data)
+                        episode_data["viewable_id"] = episode_item["id"]
+                        episode_data["season"] = season_item["seq"],
+                        episode_data["episode"] = episode_item["seq"]
+                        download_list.append(Viewable(episode_data, self))
         return download_list
-
-    async def download(self, any_id, episode=None, season=None, output=default_file_name) -> str:
-        self.log("Starting process... [FlixCrack {}]".format(version("flixcrack")))
-        for viewable in self._get_viewables(any_id, episode, season):
-            self._verbose(viewable)
-            viewable_id = viewable["viewable_id"]
-            output_folder = f"temp{viewable_id}"
-            playlist = Parse(self.msl.load_playlist(viewable_id), self)
-            keys = self.get_keys(viewable_id)
-            muxed_filename = f"{self.download_path}/{output}"
-            video_stream = playlist.video_streams[0]
-            encrypted_filename = "".join([
-                f"{output_folder}/",
-                f"video[{viewable_id}]",
-                f"[{video_stream['h']}p]",
-                f"[{self.video_profile.upper()}]"
-            ])
-            decrypted_filename = encrypted_filename + "[Decrypted].mp4"
-
-            if not os.path.exists(output_folder):
-                os.mkdir(output_folder)
-            if not os.path.exists(encrypted_filename) and \
-            not os.path.exists(decrypted_filename):
-                self.log(f"Downloading {encrypted_filename} " + \
-                    f"({pretty_size(video_stream['size'])})...")
-                await self._aria2c(
-                    video_stream["url"],
-                    encrypted_filename
-                )
-            if not os.path.exists(decrypted_filename):
-                self.log(f"Decrypting {encrypted_filename}...")
-                await self._decrypt(
-                    encrypted_filename,
-                    decrypted_filename, keys
-                )
-            await self._remux(decrypted_filename)
-
-            for language in list(playlist.audio_streams.keys()) + \
-            list(playlist.audio_description_streams.keys()):
-                language_track = playlist.audio_streams.get(language,
-                    playlist.audio_description_streams.get(language))
-                if not language_track:
-                    continue
-                audio_stream = language_track[0]
-                audio_filename = "".join([
-                    f"{output_folder}/",
-                    f"audio[{viewable_id}]",
-                    f"[{audio_stream['language']}]",
-                    f"[{audio_stream['language_code']}]",
-                    f"[{self.audio_profile.upper()}]"
-                ])
-                if not os.path.exists(audio_filename):
-                    self.log(f"Downloading {audio_filename} " + \
-                        f"({pretty_size(audio_stream['size'])})...")
-                    await self._aria2c(
-                        audio_stream["url"],
-                        audio_filename
-                    )
-                    await self._demux_audio(audio_filename, 
-                        f"{audio_filename}.{self.audio_profile.lower()}")
-            for language in list(playlist.subtitle_streams.keys()) + \
-            list(playlist.forced_streams.keys()):
-                language_track = playlist.subtitle_streams.get(language,
-                    playlist.forced_streams.get(language))
-                if not language_track:
-                    continue
-                subtitles = language_track[0]
-                subtitles_filename = "".join([
-                    f"{output_folder}/",
-                    f"subtitles[{viewable_id}]",
-                    f"[{subtitles['language']}]",
-                    f"[{subtitles['language_code']}].vtt",
-                ])
-                if not os.path.exists(subtitles_filename):
-                    self.log(f"Downloading {subtitles_filename}...")
-                    await self._aria2c(subtitles["url"], subtitles_filename)
-                    self.log(f"Converting {subtitles_filename} to SRT...")
-                    Converter(subtitles_filename).to_srt()
-                    os.remove(subtitles_filename)
-            self.log(f"Muxing all tracks...")
-            muxer = Muxer(output_folder, muxed_filename, self.verbose)
-            final_name = muxed_filename
-            file_data = await muxer.run()
-
-            file_data["title"] = viewable["title"]
-            file_data["season"] = viewable["season"]
-            file_data["episode"] = viewable["episode"]
-
-            file_data["ftitle"] = re.sub(" ", ".",
-                re.sub(r"[^a-zA-Z0-9 ]", "", viewable["title"]))
-            file_data["fseason"] = f"S{str(viewable['season']).zfill(2)}" if viewable["season"] else None
-            file_data["fepisode"] = f"E{str(viewable['episode']).zfill(2)}" if viewable["episode"] else None
-    
-            for k, v in file_data.items():
-                if isinstance(v, list):
-                    v = ".".join(list(map(str, list(dict.fromkeys(v)))))
-                final_name = final_name.replace(f"${k}$", str(v)).replace("..", ".")
-
-            if not final_name.endswith(".mkv"):
-                final_name += ".mkv"
-
-            if final_name != muxed_filename:
-                if os.path.exists(final_name):
-                    os.remove(final_name)
-                os.rename(muxed_filename, final_name)
-
-            self.log(f"Muxed: {final_name}",
-                f"({pretty_size(os.path.getsize(final_name))})")
-            return final_name
         
     async def _decrypt(self, _input: str, output: str, keys: list[str]):
         if self.decryption_method == "shaka":
@@ -367,8 +271,9 @@ class NetflixClient:
             "--auto-file-renaming=false"
         ]
         if self.proxies:
-            for protocol, proxy in self.proxies.items():
-                cmd += [f"--all-proxy={protocol}://{proxy}"]
+            for proxy in self.proxies.values():
+                cmd += [f"--all-proxy={proxy}"]
+                break
         try:
             proc = await asyncio.create_subprocess_exec(
                 *cmd, "-o", output, _input,
@@ -378,6 +283,131 @@ class NetflixClient:
             await proc.communicate()
         except FileNotFoundError:
             raise FileNotFoundError("aria2 not found in your PATH or in your working folder.")
+
+class Viewable:
+    def __init__(self, viewable_data: dict, client: NetflixClient):
+        self.client = client
+        self.vid = viewable_data.get("viewable_id")
+        self.title = viewable_data.get("title")
+        self.year = viewable_data.get("year", "")
+        self.season = viewable_data.get("season")
+        self.episode = viewable_data.get("episode")
+
+    async def download(self, output=default_file_name) -> str:
+        try:
+            _version = version("flixcrack")
+            self.client.log(f"Starting process... [FlixCrack {_version}]")
+        except:
+            self.client.log("You are using FlixCrack from source code! Install the library with pip command.")
+        
+        self.client._verbose(f"Proxy map: {self.client.proxies}")
+
+        output_folder = f"temp{self.vid}"
+        muxed_filename = f"{self.client.download_path}/{output}"
+
+        playlist = Parse(self.client.msl.load_playlist(self.vid), self.client)
+        keys = self.client.get_keys(self.vid)
+
+        video_stream = playlist.video_streams[0]
+        encrypted_filename = "".join([
+            f"{output_folder}/",
+            f"video[{self.vid}]",
+            f"[{video_stream['h']}p]",
+            f"[{self.client.video_profile.upper()}]"
+        ])
+        decrypted_filename = f"{encrypted_filename}[Decrypted].mp4"
+
+        if not os.path.exists(output_folder):
+            os.mkdir(output_folder)
+        if not os.path.exists(encrypted_filename) and \
+        not os.path.exists(decrypted_filename):
+            self.client.log(f"Downloading {encrypted_filename} " + \
+                f"({pretty_size(video_stream['size'])})...")
+            await self.client._aria2c(
+                video_stream["url"],
+                encrypted_filename
+            )
+        if not os.path.exists(decrypted_filename):
+            self.client.log(f"Decrypting {encrypted_filename}...")
+            await self.client._decrypt(
+                encrypted_filename,
+                decrypted_filename, keys
+            )
+        # FFmpeg fix in case of decryption's issues (like stuttering)
+        await self.client._remux(decrypted_filename)
+
+        for language in list(playlist.audio_streams.keys()) + \
+        list(playlist.audio_description_streams.keys()):
+            language_track = playlist.audio_streams.get(language,
+                playlist.audio_description_streams.get(language))
+            if not language_track:
+                continue
+            audio_stream = language_track[0]
+            audio_filename = "".join([
+                f"{output_folder}/",
+                f"audio[{self.vid}]",
+                f"[{audio_stream['language']}]",
+                f"[{audio_stream['language_code']}]",
+                f"[{self.client.audio_profile.upper()}]"
+            ])
+            if not os.path.exists(audio_filename):
+                self.client.log(f"Downloading {audio_filename} " + \
+                    f"({pretty_size(audio_stream['size'])})...")
+                await self.client._aria2c(
+                    audio_stream["url"],
+                    audio_filename
+                )
+                await self.client._demux_audio(audio_filename, 
+                    f"{audio_filename}.{self.client.audio_profile.lower()}")
+        for language in list(playlist.subtitle_streams.keys()) + \
+        list(playlist.forced_streams.keys()):
+            language_track = playlist.subtitle_streams.get(language,
+                playlist.forced_streams.get(language))
+            if not language_track:
+                continue
+            subtitles = language_track[0]
+            subtitles_filename = "".join([
+                f"{output_folder}/",
+                f"subtitles[{self.vid}]",
+                f"[{subtitles['language']}]",
+                f"[{subtitles['language_code']}].vtt",
+            ])
+            if not os.path.exists(subtitles_filename):
+                self.client.log(f"Downloading {subtitles_filename}...")
+                await self.client._aria2c(subtitles["url"], subtitles_filename)
+                self.client.log(f"Converting {subtitles_filename} to SRT...")
+                Converter(subtitles_filename).to_srt()
+                os.remove(subtitles_filename)
+        self.client.log(f"Muxing all tracks...")
+        muxer = Muxer(output_folder, muxed_filename, self.client.verbose)
+        final_name = muxed_filename
+        file_data = await muxer.run()
+
+        file_data["title"] = self.title
+        file_data["year"] = self.year
+        file_data["season"] = self.season
+        file_data["episode"] = self.episode
+
+        file_data["ftitle"] = re.sub(" ", ".", re.sub(r"[^a-zA-Z0-9 ]", "", self.title))
+        file_data["fseason"] = f"S{str(self.season).zfill(2)}" if self.season else ""
+        file_data["fepisode"] = f"E{str(self.episode).zfill(2)}" if self.episode else ""
+
+        for k, v in file_data.items():
+            if isinstance(v, list):
+                v = ".".join(list(map(str, list(dict.fromkeys(v)))))
+            final_name = final_name.replace(f"${k}$", str(v)).replace("..", ".")
+
+        if not final_name.endswith(".mkv"):
+            final_name += ".mkv"
+
+        if final_name != muxed_filename:
+            if os.path.exists(final_name):
+                os.remove(final_name)
+            os.rename(muxed_filename, final_name)
+
+        self.client.log(f"Muxed: {final_name}",
+            f"({pretty_size(os.path.getsize(final_name))})")
+        return final_name
 
 class MSLClient:
     def __init__(self, config: NetflixClient):
@@ -672,7 +702,7 @@ class MSLClient:
         request_data = self.msl_request(payload)
         response = self.session.post(self.manifests, data=request_data)
         manifest = json.loads(json.dumps(self.decrypt_response(response.text)))
-        self.config._verbose(manifest)
+        self.config._verbose_file(manifest, "manifest")
         if error := manifest.get("errormsg", manifest.get("error")):
             if manifest.get("errorcode") == 7:
                 raise LoginError(manifest.get("error", {}).get("display", error))

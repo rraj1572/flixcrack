@@ -123,11 +123,12 @@ class NetflixClient:
             os.mkdir(path)
         file = name + str(random.randint(1000,5000))
         final = f"{path}/{file}.txt"
+        try:
+            content = json.dumps(content, indent=4)
+            final = final.replace(".txt", ".json")
+        except:
+            pass
         with open(final, "w+", encoding="utf-8") as file:
-            try:
-                content = json.dumps(content, indent=4)
-            except:
-                pass
             file.write(content)
         print(f"Verbose saved in {final}")
 

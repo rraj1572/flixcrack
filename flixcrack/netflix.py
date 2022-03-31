@@ -116,6 +116,8 @@ class NetflixClient:
             print(*args)
 
     def _verbose_file(self, content, name=""):
+        if not self.verbose:
+            return
         path = "log_files"
         if not os.path.exists(path):
             os.mkdir(path)
@@ -201,7 +203,7 @@ class NetflixClient:
                     if episode == "all" or episode_item["seq"] == episode:
                         episode_data = viewable_data.copy()
                         episode_data["viewable_id"] = episode_item["id"]
-                        episode_data["season"] = season_item["seq"],
+                        episode_data["season"] = season_item["seq"]
                         episode_data["episode"] = episode_item["seq"]
                         download_list.append(Viewable(episode_data, self))
         return download_list

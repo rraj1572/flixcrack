@@ -367,8 +367,8 @@ class NetflixClient:
             "--auto-file-renaming=false"
         ]
         if self.proxies:
-            for protocol, proxy in self.proxies.items():
-                cmd += [f"--all-proxy={protocol}://{proxy}"]
+            for proxy in self.proxies.values():
+                cmd += [f"--all-proxy={proxy}"]
         try:
             proc = await asyncio.create_subprocess_exec(
                 *cmd, "-o", output, _input,

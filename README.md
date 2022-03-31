@@ -70,7 +70,7 @@ client = NetflixClient(
 )
 
 async def main():
-    for viewable in get_viewables(81470938, episode=1)
+    for viewable in client.get_viewables(81470938, episode=1):
         await viewable.download()
 asyncio.run(main())
 ```

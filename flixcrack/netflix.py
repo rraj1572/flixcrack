@@ -233,7 +233,7 @@ class NetflixClient:
         self._verbose(std)
         if err:
             stderr = err.decode()
-            if "finalized" not in stderr.lower():
+            if "finalized" not in stderr.lower() or "successfully" not in stderr.lower():
                 if os.path.exists(output):
                     os.remove(output)
                 raise DecryptionError(f"Error decrypting: {err}")

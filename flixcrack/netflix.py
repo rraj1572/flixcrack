@@ -233,7 +233,7 @@ class NetflixClient:
         self._verbose(std)
         if err:
             stderr = err.decode()
-            if "finalized" not in stderr.lower() or \
+            if "finalized" not in stderr.lower() and \
             "successfully" not in stderr.lower():
                 if os.path.exists(output):
                     os.remove(output)

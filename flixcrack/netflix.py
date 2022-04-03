@@ -191,7 +191,7 @@ class NetflixClient:
             episode=None
         )
         if _type == "movie":
-            viewable_data["title"] = metadata["year"]
+            viewable_data["year"] = metadata["year"]
             download_list.append(Viewable(viewable_data, self))
         elif _type == "show":
             if not season:
@@ -233,10 +233,11 @@ class NetflixClient:
         self._verbose(std)
         if err:
             stderr = err.decode()
-            if "finalized" not in stderr.lower() or "successfully" not in stderr.lower():
+            if "finalized" not in stderr.lower() or \
+            "successfully" not in stderr.lower():
                 if os.path.exists(output):
                     os.remove(output)
-                raise DecryptionError(f"Error decrypting: {err}")
+                raise DecryptionError(f"Error decrypting: {stderr}")
         os.remove(_input)
 
     async def _remux(self, _input: str):

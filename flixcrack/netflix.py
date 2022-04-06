@@ -180,7 +180,7 @@ class NetflixClient:
         keyswvdecrypt = wvdecrypt.start_process()[1]
         return keyswvdecrypt
 
-    def get_viewables(self, any_id, episode=None, season=None) -> list:
+    def get_viewables(self, any_id, episode=None, season=None) -> list["Viewable"]:
         download_list = []
         metadata = self.get_metadata(any_id)
         _type = metadata["type"]

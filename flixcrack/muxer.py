@@ -15,11 +15,11 @@ audio_subs_reg = re.compile(
 )
 
 codecs = {
-    "MAIN": "x264",
-    "HIGH": "x264",
-    "BASELINE": "x264",
-    "HEVC": "H265",
-    "HDR": "HDR.H265"
+    "MAIN": "H.264",
+    "HIGH": "H.264",
+    "BASELINE": "H.264",
+    "HEVC": "H.265",
+    "HDR": "HDR.H.265"
 }
 
 class Muxer:
@@ -59,14 +59,14 @@ class Muxer:
             if k == "audio":
                 for v in files[k]:
                     match = audio_subs_reg.search(v)
-                    language = lang_codes.get(match.group("id"))
+                    audio_language = lang_codes.get(match.group("id"))
                     if "audios" not in data:
                         data["audios"] = []
-                    data["audios"].append(language[1].upper())
+                    data["audios"].append(audio_language[1].upper())
                     data["acodec"] = match.group("codec")
                     self.command += [
                         "--language",
-                        "0:"+language[1],
+                        "0:"+audio_language[1],
                         "--track-name",
                         "0:"+match.group("language"),
                         "--compression",
@@ -76,10 +76,10 @@ class Muxer:
             if k == "subtitles":
                 for v in files[k]:
                     match = audio_subs_reg.search(v)
-                    language = lang_codes.get(match.group("id"))
+                    subtitle_language = lang_codes.get(match.group("id"))
                     self.command += [
                         "--language",
-                        "0:"+language[1],
+                        "0:"+subtitle_language[1],
                         "--track-name",
                         "0:"+match.group("language"),
                         "--default-track",
@@ -91,11 +91,14 @@ class Muxer:
                         "(", v, ")",
                     ]
 
-        proc = await asyncio.create_subprocess_exec(
-            *self.command,
-            stdout=asyncio.subprocess.PIPE if not self.verbose else None,
-            stderr=asyncio.subprocess.PIPE if not self.verbose else None
-        )
-        await proc.communicate()
+        try:
+            proc = await asyncio.create_subprocess_exec(
+                *self.command,
+                stdout=asyncio.subprocess.PIPE if not self.verbose else None,
+                stderr=asyncio.subprocess.PIPE if not self.verbose else None
+            )
+            await proc.communicate()
+        except:
+            raise FileNotFoundError("mkvmerge not found in your PATH or in your working folder.")
         shutil.rmtree(self.folder)
         return data

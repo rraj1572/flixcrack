@@ -152,10 +152,11 @@ class NetflixClient:
             }, proxies=self.proxies
         )
         if r.status_code != 200:
-            self._verbose_file(r.text, "shakti")
+            self._verbose_file(r.text, "shaktierror")
             raise NetflixStatusError(f"Netflix did not return 200 ({r.status_code})")
         if r.text.strip() == "":
             raise GeoError("Title not available in your country.")
+        self._verbose_file(r.text, "metadata")
         return r.json()["video"]
 
     def inrange(self, target, number) -> bool:

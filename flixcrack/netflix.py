@@ -158,6 +158,10 @@ class NetflixClient:
             raise GeoError("Title not available in your country.")
         return r.json()["video"]
 
+    def inrange(self, target, number) -> bool:
+        if match := re.match(r"^(\d+)-(\d+)$", target):
+            return int(match.group(1)) <= number <= int(match.group(2))
+
     def get_keys(self, media_id) -> list:
         playlist = self.msl.load_playlist(media_id, ignore=["playready-h264hpl40-dash"])    
         drm_header = playlist["result"]["video_tracks"][0]["drmHeader"]["bytes"]
@@ -201,7 +205,8 @@ class NetflixClient:
                 and season != "all":
                     continue
                 for episode_item in season_item["episodes"]:
-                    if episode == "all" or episode_item["seq"] == episode:
+                    if episode == "all" or episode_item["seq"] == episode or \
+                    self.inrange(episode, episode_item["seq"]):
                         episode_data = viewable_data.copy()
                         episode_data["viewable_id"] = episode_item["id"]
                         episode_data["season"] = season_item["seq"]

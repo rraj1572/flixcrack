@@ -160,7 +160,7 @@ class NetflixClient:
         return r.json()["video"]
 
     def inrange(self, target, number) -> bool:
-        if match := re.match(r"^(\d+)-(\d+)$", target):
+        if match := re.match(r"^(\d+)-(\d+)$", str(target)):
             return int(match.group(1)) <= number <= int(match.group(2))
 
     def get_keys(self, media_id) -> list:
@@ -185,7 +185,7 @@ class NetflixClient:
         keyswvdecrypt = wvdecrypt.start_process()[1]
         return keyswvdecrypt
 
-    def get_viewables(self, any_id, episode=None, season=None) -> list["Viewable"]:
+    def get_viewables(self, any_id, episode="all", season=1) -> list["Viewable"]:
         download_list = []
         metadata = self.get_metadata(any_id)
         _type = metadata["type"]
@@ -199,8 +199,6 @@ class NetflixClient:
             viewable_data["year"] = metadata["year"]
             download_list.append(Viewable(viewable_data, self))
         elif _type == "show":
-            if not season:
-                season = 1
             for season_item in metadata["seasons"]:
                 if season_item["seq"] != season \
                 and season != "all":

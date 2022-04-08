@@ -23,10 +23,11 @@ codecs = {
 }
 
 class Muxer:
-    def __init__(self, folder, muxed, verbose):
+    def __init__(self, folder, muxed, verbose, keep):
         self.folder = folder
         self.muxed = muxed
         self.verbose = verbose
+        self.keep = keep
         self.command = []
 
     async def run(self) -> dict:
@@ -100,5 +101,6 @@ class Muxer:
             await proc.communicate()
         except:
             raise FileNotFoundError("mkvmerge not found in your PATH or in your working folder.")
-        shutil.rmtree(self.folder)
+        if not self.keep:
+            shutil.rmtree(self.folder)
         return data

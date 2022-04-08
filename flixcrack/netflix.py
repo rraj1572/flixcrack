@@ -64,6 +64,7 @@ class NetflixClient:
         subtitle_language: list = [],
         forced_language: list = [],
         proxies: dict = {},
+        keep: bool = False,
         decryption_method: str = "shaka",
         decrypt_executable: str = "shakapackager",
         verbose: bool = False,
@@ -107,6 +108,7 @@ class NetflixClient:
         self.cookies: dict = read_data(cookies_file)
         self.verbose: bool = verbose
         self.quiet: bool = quiet
+        self.keep: bool = keep
         self.decryption_method: str = decryption_method
         self.decryption_executable: str = decrypt_executable
         self.msl: MSLClient = MSLClient(self)
@@ -387,7 +389,7 @@ class Viewable:
                 Converter(subtitles_filename).to_srt()
                 os.remove(subtitles_filename)
         self.client.log(f"Muxing all tracks...")
-        muxer = Muxer(output_folder, muxed_filename, self.client.verbose)
+        muxer = Muxer(output_folder, muxed_filename, self.client.verbose, self.client.keep)
         final_name = muxed_filename
         file_data = await muxer.run()
 

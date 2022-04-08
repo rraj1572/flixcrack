@@ -124,7 +124,7 @@ class NetflixClient:
         file = name + str(random.randint(1000,5000))
         final = f"{path}/{file}.txt"
         try:
-            content = json.dumps(json.loads(content), indent=4)
+            content = json.dumps(content, indent=4)
             final = final.replace(".txt", ".json")
         except:
             pass

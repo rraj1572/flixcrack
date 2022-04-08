@@ -387,7 +387,8 @@ class Viewable:
                 await self.client._aria2c(subtitles["url"], subtitles_filename)
                 self.client.log(f"Converting {subtitles_filename} to SRT...")
                 Converter(subtitles_filename).to_srt()
-                os.remove(subtitles_filename)
+                if not self.client.keep:
+                    os.remove(subtitles_filename)
         self.client.log(f"Muxing all tracks...")
         muxer = Muxer(output_folder, muxed_filename, self.client.verbose, self.client.keep)
         final_name = muxed_filename

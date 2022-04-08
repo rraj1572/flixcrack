@@ -23,7 +23,7 @@ class Converter:
     def to_srt(self):
         new_lines = []
         subtitle_esp = re.compile(
-            " ".join([
+            r"\s+".join([
                 r"([\d\.:]+ \-\-\> [\d\.:]+)",
                 r"position:[\d.\.]+%,\w+",
                 r"align:(\w+)",

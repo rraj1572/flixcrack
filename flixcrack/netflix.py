@@ -711,7 +711,7 @@ class MSLClient:
 		}
         
         request_data = self.msl_request(payload)
-        response = self.session.post(self.manifests, data=request_data)
+        response = self.session.post(self.manifests, data=request_data, params={"reqName": "licensedManifest"})
         manifest = json.loads(json.dumps(self.decrypt_response(response.text)))
         self.config._verbose_file(manifest, "manifest")
         if error := manifest.get("errormsg", manifest.get("error")):

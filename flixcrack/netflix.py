@@ -276,6 +276,8 @@ class NetflixClient:
         cmd = [
             "aria2c", "-x16", "-j16", "-s16",
             "--download-result=hide",
+            "--file-allocation=none",
+            "--summary-interval=0",
             "--auto-file-renaming=false"
         ]
         if self.proxies:

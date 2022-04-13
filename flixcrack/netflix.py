@@ -31,8 +31,6 @@ from .utils import (
     default_file_name,
     supported_video_profiles,
     supported_audio_profiles,
-    manifests_url,
-    licenses_url,
     lang_codes
 )
 
@@ -427,8 +425,7 @@ class MSLClient:
         self.session = requests.Session()
         if self.config.proxies:
             self.session.proxies.update(self.config.proxies)
-        self.manifests = manifests_url
-        self.licenses = licenses_url
+        self.msl_url = "https://www.netflix.com/nq/msl_v1/cadmium/pbo_licenses/^1.0.0/router"
         self.esn = get_android_esn(config.quality)
         self.email = config.email
         self.password = config.password
@@ -496,7 +493,8 @@ class MSLClient:
                 json.dumps(headerdata).encode("utf8")
             ).decode("utf8"),
 		}
-        r = self.session.post(self.manifests, json=request)
+        r = self.session.post(self.msl_url, json=request,
+            params={"reqName": "manifest"})
         handshake = self.parse_handshake(response=r.json())
         return handshake
         
@@ -605,7 +603,7 @@ class MSLClient:
 		}
         
         request_data = self.msl_request(license_request_data)
-        r = self.session.post(self.licenses, data=request_data)
+        r = self.session.post(self.msl_url, data=request_data)
         
         try:
             r.json()
@@ -711,7 +709,8 @@ class MSLClient:
 		}
         
         request_data = self.msl_request(payload)
-        response = self.session.post(self.manifests, data=request_data)
+        response = self.session.post(self.msl_url, data=request_data,
+            params={"reqName": "manifest"})
         manifest = json.loads(json.dumps(self.decrypt_response(response.text)))
         self.config._verbose_file(manifest, "manifest")
         if error := manifest.get("errormsg", manifest.get("error")):
@@ -727,7 +726,10 @@ class MSLClient:
         header["handshake"] = is_handshake
         header["userauthdata"] = {
 			"scheme": "EMAIL_PASSWORD",
-			"authdata": {"email": self.email, "password": self.password}
+			"authdata": {
+                "email": self.email,
+                "password": self.password
+            }
 		}
         
         header_envelope = self.msl_encrypt(self.session_keys, json.dumps(header))

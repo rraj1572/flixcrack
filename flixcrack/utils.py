@@ -6,9 +6,6 @@ from http.cookiejar import MozillaCookieJar
 
 metadata_endpoint = "https://www.netflix.com/api/shakti/{}/metadata"
 
-manifests_url = "https://www.netflix.com/nq/msl_v1/cadmium/pbo_licenses/^1.0.0/router?reqName=manifest"
-licenses_url = "https://www.netflix.com/nq/msl_v1/cadmium/pbo_licenses/^1.0.0/router"
-
 default_file_name = "$ftitle$.$year$.$fseason$$fepisode$.NF.WEBDL.$quality$p.$audios$.$acodec$.$vcodec$-dvx.mkv"
 
 def random_hex(length: int) -> str:

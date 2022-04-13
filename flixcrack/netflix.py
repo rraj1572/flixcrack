@@ -249,7 +249,7 @@ class NetflixClient:
             _temp = ".".join(_input.split(".")[:-1])
             os.rename(_input, _temp)
             proc = await asyncio.create_subprocess_exec(
-                "ffmpeg", "-y", "-i", _temp, "-c", "copy", _input, 
+                "ffmpeg", "-y", "-i", _temp, "-v", "panic", "-stats", "-c", "copy", _input, 
                 stdout=asyncio.subprocess.PIPE if not self.verbose else None,
                 stderr=asyncio.subprocess.PIPE if not self.verbose else None
             )
@@ -263,6 +263,7 @@ class NetflixClient:
         try:
             proc = await asyncio.create_subprocess_exec(
                 "ffmpeg", "-y", "-i", _input,
+                "-v", "panic", "-stats",
                 "-map", "0:a", "-c", "copy", output, 
                 stdout=asyncio.subprocess.PIPE if not self.verbose else None,
                 stderr=asyncio.subprocess.PIPE if not self.verbose else None

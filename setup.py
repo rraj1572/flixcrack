@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="flixcrack",
-    version="2022.4.14",
+    version="2022.4.14.1",
     author="stefanodvx",
     author_email="pp.stefanodvx@gmail.com",
     description="Netflix API Metadata & Downloader for Windows and Linux",
@@ -21,7 +21,7 @@ setuptools.setup(
     ],
     install_requires=[
         "requests",
-        "protobuf"
+        "protobuf",
         "pycryptodomex"
     ],
     packages=setuptools.find_packages(),

@@ -30,7 +30,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
           python-version: '3.9.8'
-          - name: Install dependencies for pypi
+    - name: Install dependencies for pypi
       env:
         PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
       if: "env.PYPI_TOKEN != ''"

@@ -23,8 +23,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Push updates to PyPi
-      uses: stefanodvx/flixcrack@main
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+          python-version: '3.9.8'
       with:
         user: __token__
         password: ${{ secrets.pypi_password }}

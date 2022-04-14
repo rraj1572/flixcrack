@@ -24,7 +24,7 @@ jobs:
 
     steps:
     - name: Push updates to PyPi
-      uses: stefanodvx/flixcrack@master
+      uses: stefanodvx/flixcrack@main
       with:
         user: __token__
         password: ${{ secrets.pypi_password }}

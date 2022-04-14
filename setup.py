@@ -3,12 +3,9 @@ import setuptools
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-with open("requirements.txt", "r", encoding="utf-8") as f:
-    requirements = f.read().splitlines()
-
 setuptools.setup(
     name="flixcrack",
-    version="2022.4.13",
+    version="2022.4.14",
     author="stefanodvx",
     author_email="pp.stefanodvx@gmail.com",
     description="Netflix API Metadata & Downloader for Windows and Linux",
@@ -22,7 +19,11 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    install_requires=requirements,
+    install_requires=[
+        "requests",
+        "protobuf"
+        "pycryptodomex"
+    ],
     packages=setuptools.find_packages(),
-    python_requires=">=3.6",
+    python_requires=">=3.9.8",
 )

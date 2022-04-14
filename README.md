@@ -36,7 +36,9 @@
 
 ## How To Use
 
-First of all, install the library with `pip install git+https://github.com/stefanodvx/flixcrack@main` (you need Git for this)
+First of all, install the library with:
+`pip install flixcrack` (by PyPi) or get always latest by
+`pip install git+https://github.com/stefanodvx/flixcrack@main` (you need Git installed for this)
 
 Extract your cookies.txt from Netflix using your browser (you can use <a href="https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid">Get cookies.txt</a>) and put it in your working folder. Then create a folder named "devices" and put your CDM in. Here's an example code, I'm downloading first episode of a series in 1080p with HIGH profile and AAC audio (English).
 

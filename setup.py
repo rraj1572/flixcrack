@@ -23,7 +23,7 @@ setuptools.setup(
         "requests",
         "protobuf",
         "pycryptodomex",
-        "git+https://github.com/tpubg583/hyper@development" if sys.verison_info.major==3 and sys.version_info.minor>=10 else "hyper"
+        "git+https://github.com/tpubg583/hyper@development" if sys.version_info.major==3 and sys.version_info.minor>=10 else "hyper"
     ],
     packages=setuptools.find_packages(),
     python_requires=">=3.9.8",

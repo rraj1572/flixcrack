@@ -20,6 +20,7 @@ from Cryptodome.Signature import pss
 from Cryptodome.Util import Padding
 from importlib.metadata import version
 from datetime import datetime
+from hyper.contrib import HTTP20Adapter
 
 from .utils import (
     read_data,
@@ -426,6 +427,7 @@ class MSLClient:
         self.config = config
         self.cdm = CDM()
         self.session = requests.Session()
+        self.session.mount("https://", HTTP20Adapter())
         if self.config.proxies:
             self.session.proxies.update(self.config.proxies)
         self.msl_url = "https://www.netflix.com/nq/msl_v1/cadmium/pbo_licenses/^1.0.0/router"

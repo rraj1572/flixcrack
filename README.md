@@ -1,7 +1,9 @@
 
 <h1 align="center">
   <br>
-  <a href="https://github.com/stefanodvx/flixcrack"><img src="https://github.com/stefanodvx/flixcrack/blob/main/logo.png?raw=true" alt="FlixCrack" height=100></a>
+  <a href="https://github.com/stefanodvx/flixcrack"><img src="https://github.com/stefanodvx/flixcrack/blob/main/logo.png?raw=true" alt="FlixCrack" height=100> 
+</a>
+  <p>Status: Working ✅</p>
 </h1>
 
 <h4 align="center">Python Netflix API Metadata & Downloader for Windows and Linux</h4>

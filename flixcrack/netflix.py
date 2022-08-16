@@ -288,9 +288,7 @@ class NetflixClient:
                 break
         try:
             proc = await asyncio.create_subprocess_exec(
-                *cmd, "-o", output, _input,
-                stdout=asyncio.subprocess.PIPE if not self.verbose else None,
-                stderr=asyncio.subprocess.PIPE if not self.verbose else None
+                *cmd, "-o", output, _input
             )
             await proc.communicate()
         except FileNotFoundError:
